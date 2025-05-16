@@ -12,7 +12,7 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
-import pl.xsware.domain.model.dto.JwtResponse;
+import pl.xsware.domain.model.dto.LoginResponse;
 import pl.xsware.domain.model.dto.LoginRequest;
 import pl.xsware.util.JwtUtils;
 
@@ -34,7 +34,7 @@ public class AuthenticateController {
             );
             SecurityContextHolder.getContext().setAuthentication(authentication);
             String jwt = jwtUtils.generateJwtToken(authentication.getName());
-            return ResponseEntity.ok(JwtResponse.builder().token(jwt).build());
+            return ResponseEntity.ok(LoginResponse.builder().token(jwt).name(loginRequest.getEmail()).build());
         } catch (BadCredentialsException ex) {
             return ResponseEntity
                     .status(HttpStatus.UNAUTHORIZED)

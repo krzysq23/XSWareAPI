@@ -36,11 +36,6 @@ public class CorsFilterConfig implements Filter {
             res.addHeader("Access-Control-Allow-Headers", header);
         });
 
-        if ("OPTIONS".equalsIgnoreCase(req.getMethod())) {
-            res.setStatus(HttpServletResponse.SC_OK);
-            return;
-        }
-
         chain.doFilter(request, response);
     }
 }
