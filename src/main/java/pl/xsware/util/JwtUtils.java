@@ -1,7 +1,11 @@
 package pl.xsware.util;
 
-import io.jsonwebtoken.*;
+import io.jsonwebtoken.Claims;
+import io.jsonwebtoken.JwtException;
+import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.security.Keys;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
@@ -17,6 +21,8 @@ public class JwtUtils {
 
     @Value("${jwt.expirationMs}")
     private int jwtExpirationMs;
+
+    private final Logger log = LoggerFactory.getLogger(JwtUtils.class);
 
     private SecretKey getSigningKey() {
         return Keys.hmacShaKeyFor(jwtSecret.getBytes(StandardCharsets.UTF_8));
@@ -51,16 +57,10 @@ public class JwtUtils {
                     .parseSignedClaims(authToken)
                     .getPayload();
             return claims.getExpiration().after(new Date());
-        } catch (SecurityException | MalformedJwtException e) {
-            System.err.println("Invalid JWT signature: " + e.getMessage());
-        } catch (ExpiredJwtException e) {
-            System.err.println("JWT token is expired: " + e.getMessage());
-        } catch (UnsupportedJwtException e) {
-            System.err.println("JWT token is unsupported: " + e.getMessage());
-        } catch (IllegalArgumentException e) {
-            System.err.println("JWT claims string is empty: " + e.getMessage());
+        } catch (JwtException | IllegalArgumentException e) {
+            log.error("Nieprawidłowy token: {}", e.getMessage());
+            return false;
         }
-        return false;
     }
 
 }
