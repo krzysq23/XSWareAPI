@@ -16,6 +16,7 @@ import pl.xsware.domain.model.dto.LoginRequest;
 import pl.xsware.domain.model.dto.LoginResponse;
 import pl.xsware.domain.model.dto.RegisterRequest;
 import pl.xsware.domain.model.dto.Response;
+import pl.xsware.domain.model.entity.auth.User;
 import pl.xsware.domain.service.UserService;
 import pl.xsware.util.JwtUtils;
 
@@ -42,7 +43,14 @@ public class AuthenticateController {
             );
             SecurityContextHolder.getContext().setAuthentication(authentication);
             String jwt = jwtUtils.generateJwtToken(authentication.getName());
-            return ResponseEntity.ok(LoginResponse.builder().token(jwt).name(loginRequest.getEmail()).build());
+            User user = userService.getUserByEmail(loginRequest.getEmail());
+            LoginResponse loginResp = LoginResponse.builder()
+                    .token(jwt)
+                    .email(user.getEmail())
+                    .firstName(user.getFirstName())
+                    .lastName(user.getLastName())
+                    .build();
+            return ResponseEntity.ok(loginResp);
         } catch (BadCredentialsException ex) {
             return ResponseEntity
                     .status(HttpStatus.UNAUTHORIZED)
