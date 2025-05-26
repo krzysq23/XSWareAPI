@@ -14,6 +14,9 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
 import pl.xsware.domain.model.dto.LoginRequest;
 import pl.xsware.domain.model.dto.LoginResponse;
+import pl.xsware.domain.model.dto.RegisterRequest;
+import pl.xsware.domain.model.dto.Response;
+import pl.xsware.domain.service.UserService;
 import pl.xsware.util.JwtUtils;
 
 @RestController
@@ -22,6 +25,9 @@ public class AuthenticateController {
 
     @Autowired
     private AuthenticationManager authenticationManager;
+
+    @Autowired
+    private UserService userService;
 
     @Autowired
     private JwtUtils jwtUtils;
@@ -44,14 +50,26 @@ public class AuthenticateController {
         }
     }
 
+    @PostMapping("/register")
+    public ResponseEntity<Response> registerUser(@RequestBody RegisterRequest data) {
+        try {
+            userService.createUser(data);
+            return ResponseEntity.ok(Response.builder().message("Utowrzono użytkownika").build());
+        } catch (IllegalArgumentException ex) {
+            return ResponseEntity
+                    .status(HttpStatus.UNAUTHORIZED)
+                    .body(Response.builder().message(ex.getMessage()).build());
+        }
+    }
+
     @GetMapping("/token/valid")
-    public ResponseEntity<String> tokenValid(@RequestHeader("Authorization") String authHeader) {
+    public ResponseEntity<Response> tokenValid(@RequestHeader("Authorization") String authHeader) {
         String token = authHeader.replace("Bearer ", "");
         if (!jwtUtils.validateJwtToken(token)) {
-            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("INVALID");
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(Response.builder().message("INVALID").build());
         }
         String user = jwtUtils.getEmailFromJwtToken(token);
-        return ResponseEntity.ok("VALID_" + user);
+        return ResponseEntity.ok(Response.builder().message("VALID_" + user).build());
     }
 
     @PostMapping("/logout")
