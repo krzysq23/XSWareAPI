@@ -12,12 +12,12 @@ import org.springframework.security.authentication.UsernamePasswordAuthenticatio
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
-import pl.xsware.domain.model.dto.LoginRequest;
-import pl.xsware.domain.model.dto.LoginResponse;
-import pl.xsware.domain.model.dto.RegisterRequest;
-import pl.xsware.domain.model.dto.Response;
+import org.springframework.web.client.HttpClientErrorException;
+import pl.xsware.domain.model.dto.*;
 import pl.xsware.domain.model.entity.auth.User;
 import pl.xsware.domain.service.UserService;
+import pl.xsware.domain.service.UserService2;
+import pl.xsware.util.JsonValidator;
 import pl.xsware.util.JwtUtils;
 
 @RestController
@@ -38,30 +38,41 @@ public class AuthenticateController {
     @PostMapping("/login")
     public ResponseEntity<?> authenticateUser(@RequestBody LoginRequest loginRequest) {
         try {
-            Authentication authentication = authenticationManager.authenticate(
-                    new UsernamePasswordAuthenticationToken(loginRequest.getEmail(), loginRequest.getPassword())
-            );
-            SecurityContextHolder.getContext().setAuthentication(authentication);
-            String jwt = jwtUtils.generateJwtToken(authentication.getName());
-            User user = userService.getUserByEmail(loginRequest.getEmail());
-            LoginResponse loginResp = LoginResponse.builder()
-                    .token(jwt)
-                    .email(user.getEmail())
-                    .firstName(user.getFirstName())
-                    .lastName(user.getLastName())
-                    .build();
+
+            UserDto user = userService.getUserByEmail(loginRequest.getEmail());
+            log.info("user: {}", user);
+
+
+//            Authentication authentication = authenticationManager.authenticate(
+//                    new UsernamePasswordAuthenticationToken(loginRequest.getEmail(), loginRequest.getPassword())
+//            );
+//            SecurityContextHolder.getContext().setAuthentication(authentication);
+//            String jwt = jwtUtils.generateJwtToken(authentication.getName());
+
+            LoginResponse loginResp = LoginResponse.builder().build();
+//            LoginResponse loginResp = LoginResponse.builder()
+//                    .token(jwt)
+//                    .email(user.getEmail())
+//                    .firstName(user.getFirstName())
+//                    .lastName(user.getLastName())
+//                    .build();
             return ResponseEntity.ok(loginResp);
         } catch (BadCredentialsException ex) {
             return ResponseEntity
-                    .status(HttpStatus.UNAUTHORIZED)
+                    .status(HttpStatus.BAD_REQUEST)
                     .body("Nieprawidłowy login lub hasło");
+        } catch (HttpClientErrorException ex) {
+            ErrorResponse error = ErrorResponse.parseResponse(ex.getStatusText(), ex.getStatusCode());
+            return ResponseEntity
+                    .status(ex.getStatusCode())
+                    .body(error);
         }
     }
 
     @PostMapping("/register")
     public ResponseEntity<Response> registerUser(@RequestBody RegisterRequest data) {
         try {
-            userService.createUser(data);
+//            userService.createUser(data);
             return ResponseEntity.ok(Response.builder().message("Utowrzono użytkownika").build());
         } catch (IllegalArgumentException ex) {
             return ResponseEntity

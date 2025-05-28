@@ -3,42 +3,40 @@ package pl.xsware.domain.service;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.security.core.userdetails.UsernameNotFoundException;
-import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
-import pl.xsware.domain.model.dto.RegisterRequest;
-import pl.xsware.domain.model.entity.auth.User;
-import pl.xsware.domain.repository.UserRepository;
+import org.springframework.web.client.HttpClientErrorException;
+import org.springframework.web.reactive.function.client.WebClient;
+import org.springframework.web.reactive.function.client.WebClientResponseException;
+import pl.xsware.domain.model.dto.UserDto;
+import reactor.core.publisher.Mono;
 
 @Service
 public class UserService {
 
-    @Autowired
-    private UserRepository userRepository;
-
-    @Autowired
-    private PasswordEncoder passwordEncoder;
-
     private final Logger log = LoggerFactory.getLogger(UserService.class);
 
-    public void createUser(RegisterRequest data) throws IllegalArgumentException {
+    @Value("${app.service.db-connector.endpoints.createUser}")
+    private String createUserPath;
+    @Value("${app.service.db-connector.endpoints.getUserByEmail}")
+    private String getUserByEmailPath;
 
-        if (userRepository.existsByEmail(data.getEmail())) {
-            throw new IllegalArgumentException("Email już istnieje");
-        }
+    @Autowired
+    private WebClient webClient;
 
-        User user = User.builder()
-                .firstName(data.getFirstName())
-                .lastName(data.getLastName())
-                .email(data.getEmail())
-                .password(passwordEncoder.encode(data.getPassword()))
-                .build();
-
-        userRepository.save(user);
+    public UserDto getUserByEmail(String email) {
+        UserDto user = UserDto.builder().email(email).build();
+        return webClient.post()
+                .uri(getUserByEmailPath)
+                .bodyValue(user)
+                .httpRequest(request -> log.info("\nREQUEST: {} {}, \nbody: {}", request.getMethod(), request.getURI(), user))
+                .retrieve()
+                .bodyToMono(UserDto.class)
+                .onErrorResume(WebClientResponseException.class, ex -> {
+                    log.error("\nRESPONSE ERROR: {} \nmessage: {}", ex.getMessage(), ex.getResponseBodyAsString());
+                    return Mono.error(new HttpClientErrorException(ex.getStatusCode(), ex.getResponseBodyAsString()));
+                })
+                .block();
     }
 
-    public User getUserByEmail(String email) {
-        return userRepository.findByEmail(email).orElseThrow(() ->
-                new UsernameNotFoundException("Nie znaleziono użytkownika: " + email));
-    }
 }

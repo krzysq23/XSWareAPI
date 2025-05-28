@@ -5,7 +5,7 @@ plugins {
 }
 
 group = 'pl.xsware'
-version = '0.0.1-SNAPSHOT'
+version = '0.1-sr1'
 
 java {
 	toolchain {
@@ -33,10 +33,14 @@ dependencies {
 	implementation 'org.springframework.boot:spring-boot-starter-web'
 	implementation 'org.springframework.boot:spring-boot-starter-log4j2'
 	implementation 'org.springframework.boot:spring-boot-starter-data-jpa'
+	implementation 'org.springframework.boot:spring-boot-starter-webflux'
 
 	// lombok
 	compileOnly 'org.projectlombok:lombok'
 	annotationProcessor 'org.projectlombok:lombok'
+
+	// JSON
+	implementation 'com.fasterxml.jackson.core:jackson-databind'
 
 	// JWT Library
 	implementation 'io.jsonwebtoken:jjwt-api:0.12.6'
