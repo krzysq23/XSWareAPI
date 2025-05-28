@@ -8,7 +8,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.client.HttpClientErrorException;
 import org.springframework.web.reactive.function.client.WebClient;
 import org.springframework.web.reactive.function.client.WebClientResponseException;
-import pl.xsware.domain.model.dto.UserDto;
+import pl.xsware.domain.model.UserDto;
 import reactor.core.publisher.Mono;
 
 @Service

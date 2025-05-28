@@ -3,7 +3,7 @@ package pl.xsware.api;
 import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RestController;
-import pl.xsware.domain.model.dto.Response;
+import pl.xsware.domain.model.Response;
 
 @RestController
 public class DataController {

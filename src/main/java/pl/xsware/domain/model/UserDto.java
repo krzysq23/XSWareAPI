@@ -1,4 +1,4 @@
-package pl.xsware.domain.model.dto;
+package pl.xsware.domain.model;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
 import lombok.Builder;

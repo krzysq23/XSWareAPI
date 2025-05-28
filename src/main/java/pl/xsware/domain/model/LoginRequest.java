@@ -1,4 +1,4 @@
-package pl.xsware.domain.model.dto;
+package pl.xsware.domain.model;
 
 import lombok.Builder;
 import lombok.Data;

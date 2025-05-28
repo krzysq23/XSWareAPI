@@ -11,13 +11,11 @@ import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.client.HttpClientErrorException;
-import pl.xsware.domain.model.dto.*;
-import pl.xsware.domain.model.entity.auth.User;
+import pl.xsware.domain.model.*;
 import pl.xsware.domain.service.UserService;
-import pl.xsware.domain.service.UserService2;
-import pl.xsware.util.JsonValidator;
 import pl.xsware.util.JwtUtils;
 
 @RestController
@@ -40,29 +38,26 @@ public class AuthenticateController {
         try {
 
             UserDto user = userService.getUserByEmail(loginRequest.getEmail());
-            log.info("user: {}", user);
-
-
-//            Authentication authentication = authenticationManager.authenticate(
-//                    new UsernamePasswordAuthenticationToken(loginRequest.getEmail(), loginRequest.getPassword())
-//            );
-//            SecurityContextHolder.getContext().setAuthentication(authentication);
-//            String jwt = jwtUtils.generateJwtToken(authentication.getName());
-
-            LoginResponse loginResp = LoginResponse.builder().build();
-//            LoginResponse loginResp = LoginResponse.builder()
-//                    .token(jwt)
-//                    .email(user.getEmail())
-//                    .firstName(user.getFirstName())
-//                    .lastName(user.getLastName())
-//                    .build();
-            return ResponseEntity.ok(loginResp);
+            if(user.getEmail().equals(loginRequest.getEmail())) {
+                Authentication authentication = authenticationManager.authenticate(
+                        new UsernamePasswordAuthenticationToken(loginRequest.getEmail(), loginRequest.getPassword())
+                );
+                SecurityContextHolder.getContext().setAuthentication(authentication);
+                String jwt = jwtUtils.generateJwtToken(authentication.getName());
+                return ResponseEntity.ok(LoginResponse.create(user, jwt));
+            } else {
+                throw new UsernameNotFoundException("Użytkownik nie istnieje");
+            }
         } catch (BadCredentialsException ex) {
             return ResponseEntity
                     .status(HttpStatus.BAD_REQUEST)
-                    .body("Nieprawidłowy login lub hasło");
+                    .body(ErrorResponse.parseStringResponse("Nieprawidłowy login lub hasło", HttpStatus.BAD_REQUEST));
+        } catch (UsernameNotFoundException ex) {
+            return ResponseEntity
+                    .status(HttpStatus.BAD_REQUEST)
+                    .body(ErrorResponse.parseStringResponse(ex.getMessage(), HttpStatus.BAD_REQUEST));
         } catch (HttpClientErrorException ex) {
-            ErrorResponse error = ErrorResponse.parseResponse(ex.getStatusText(), ex.getStatusCode());
+            ErrorResponse error = ErrorResponse.parseJsonResponse(ex.getStatusText(), ex.getStatusCode());
             return ResponseEntity
                     .status(ex.getStatusCode())
                     .body(error);

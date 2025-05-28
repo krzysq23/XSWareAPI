@@ -1,14 +1,14 @@
-package pl.xsware.domain.model.dto;
+package pl.xsware.domain.model;
 
 import lombok.Builder;
 import lombok.Data;
 
 @Data
 @Builder
-public class LoginResponse {
+public class RegisterRequest {
 
-    private String token;
-    private String email;
     private String firstName;
     private String lastName;
+    private String email;
+    private String password;
 }

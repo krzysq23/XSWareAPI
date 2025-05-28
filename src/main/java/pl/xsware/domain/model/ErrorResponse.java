@@ -1,6 +1,5 @@
-package pl.xsware.domain.model.dto;
+package pl.xsware.domain.model;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -21,7 +20,7 @@ public class ErrorResponse {
     private String error;
     private String message;
 
-    public static ErrorResponse parseResponse(String response, HttpStatusCode statusCode) {
+    public static ErrorResponse parseJsonResponse(String response, HttpStatusCode statusCode) {
         return JsonValidator.isValidJson(response)
                 ? JsonValidator.parseErrorResponse(response)
                 : ErrorResponse.builder()
@@ -30,5 +29,14 @@ public class ErrorResponse {
                     .error(statusCode.toString())
                     .message(response)
                     .build();
+    }
+
+    public static ErrorResponse parseStringResponse(String errorText, HttpStatusCode statusCode) {
+        return ErrorResponse.builder()
+                .timestamp(LocalDateTime.now().toString())
+                .status(statusCode.hashCode())
+                .error(statusCode.toString())
+                .message(errorText)
+                .build();
     }
 }
