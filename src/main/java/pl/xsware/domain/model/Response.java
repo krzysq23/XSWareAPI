@@ -9,4 +9,10 @@ import lombok.Data;
 public class Response {
     @JsonProperty("message")
     private String message;
+
+    public static Response create(String message) {
+        return Response.builder()
+                .message(message)
+                .build();
+    }
 }

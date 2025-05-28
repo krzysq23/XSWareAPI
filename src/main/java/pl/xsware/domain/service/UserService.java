@@ -8,7 +8,9 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.client.HttpClientErrorException;
 import org.springframework.web.reactive.function.client.WebClient;
 import org.springframework.web.reactive.function.client.WebClientResponseException;
-import pl.xsware.domain.model.UserDto;
+import pl.xsware.domain.model.LoginRequest;
+import pl.xsware.domain.model.RegisterRequest;
+import pl.xsware.domain.model.user.UserDto;
 import reactor.core.publisher.Mono;
 
 @Service
@@ -16,18 +18,34 @@ public class UserService {
 
     private final Logger log = LoggerFactory.getLogger(UserService.class);
 
-    @Value("${app.service.db-connector.endpoints.createUser}")
+    @Value("${app.service.db-connector.endpoints.userAuthenticate}")
+    private String authenticatePath;
+    @Value("${app.service.db-connector.endpoints.userCreate}")
     private String createUserPath;
-    @Value("${app.service.db-connector.endpoints.getUserByEmail}")
-    private String getUserByEmailPath;
+    @Value("${app.service.db-connector.endpoints.userExist}")
+    private String userExistPath;
 
     @Autowired
     private WebClient webClient;
 
-    public UserDto getUserByEmail(String email) {
-        UserDto user = UserDto.builder().email(email).build();
+    public UserDto authenticate(LoginRequest data) {
         return webClient.post()
-                .uri(getUserByEmailPath)
+                .uri(authenticatePath)
+                .bodyValue(data)
+                .httpRequest(request -> log.info("\nREQUEST: {} {}, \nbody: {}", request.getMethod(), request.getURI(), data))
+                .retrieve()
+                .bodyToMono(UserDto.class)
+                .onErrorResume(WebClientResponseException.class, ex -> {
+                    log.error("\nRESPONSE ERROR: {} \nmessage: {}", ex.getMessage(), ex.getResponseBodyAsString());
+                    return Mono.error(new HttpClientErrorException(ex.getStatusCode(), ex.getResponseBodyAsString()));
+                })
+                .block();
+    }
+
+    public void createUser(RegisterRequest data) {
+        UserDto user = UserDto.builder().email(data.getEmail()).build();
+        webClient.post()
+                .uri(createUserPath)
                 .bodyValue(user)
                 .httpRequest(request -> log.info("\nREQUEST: {} {}, \nbody: {}", request.getMethod(), request.getURI(), user))
                 .retrieve()

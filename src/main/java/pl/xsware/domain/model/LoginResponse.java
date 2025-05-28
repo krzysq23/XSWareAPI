@@ -2,6 +2,7 @@ package pl.xsware.domain.model;
 
 import lombok.Builder;
 import lombok.Data;
+import pl.xsware.domain.model.user.UserDto;
 
 @Data
 @Builder

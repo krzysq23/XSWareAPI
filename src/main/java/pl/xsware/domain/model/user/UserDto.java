@@ -1,4 +1,4 @@
-package pl.xsware.domain.model;
+package pl.xsware.domain.model.user;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
 import lombok.Builder;
@@ -11,8 +11,9 @@ import java.util.List;
 @JsonInclude(JsonInclude.Include.NON_NULL)
 public class UserDto {
 
+    private Long id;
     private String firstName;
     private String lastName;
     private String email;
-    private List<String> role;
+    private List<RoleDto> roles;
 }
