@@ -13,6 +13,16 @@ java {
 	}
 }
 
+bootJar {
+	exclude("application-dev.yml", "application-prod.yml", "log4j2.xml")
+	duplicatesStrategy(DuplicatesStrategy.EXCLUDE)
+	launchScript()
+}
+
+jar {
+	enabled = false
+}
+
 configurations {
 	compileOnly {
 		extendsFrom annotationProcessor
@@ -38,6 +48,9 @@ dependencies {
 	compileOnly 'org.projectlombok:lombok'
 	annotationProcessor 'org.projectlombok:lombok'
 
+	// log4j
+	implementation 'org.apache.logging.log4j:log4j-slf4j2-impl:2.20.0'
+
 	// JSON
 	implementation 'com.fasterxml.jackson.core:jackson-databind'
 
@@ -50,6 +63,17 @@ dependencies {
 	testImplementation 'org.springframework.boot:spring-boot-starter-test'
 	testImplementation 'org.springframework.security:spring-security-test'
 	testRuntimeOnly 'org.junit.platform:junit-platform-launcher'
+}
+
+tasks.register('copyAppYml', Copy) {
+	from './src/main/resources/application-prod.yml'
+	from './src/main/resources/log4j2.xml'
+	into "./build/libs/config"
+	rename "-prod", ""
+}
+
+tasks.named('build') {
+	dependsOn tasks.named('copyAppYml')
 }
 
 tasks.named('test') {
