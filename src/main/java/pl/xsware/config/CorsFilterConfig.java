@@ -1,41 +1,39 @@
 package pl.xsware.config;
 
-import jakarta.servlet.*;
-import jakarta.servlet.http.HttpServletRequest;
-import jakarta.servlet.http.HttpServletResponse;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
+import org.springframework.context.annotation.Bean;
 import org.springframework.stereotype.Component;
+import org.springframework.web.cors.CorsConfiguration;
+import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
+import org.springframework.web.filter.CorsFilter;
 import pl.xsware.config.properties.CorsProperties;
 
-import java.io.IOException;
+import java.util.List;
 
 @Component
 @EnableConfigurationProperties(value = CorsProperties.class)
-public class CorsFilterConfig implements Filter {
+public class CorsFilterConfig {
 
-    private CorsProperties corsProperties;
+    private final CorsProperties corsProperties;
 
     public CorsFilterConfig(CorsProperties corsProperties) {
         this.corsProperties = corsProperties;
     }
 
-    @Override
-    public void doFilter(ServletRequest request, ServletResponse response,
-                         FilterChain chain) throws IOException, ServletException {
+    @Bean
+    public CorsFilter corsFilter() {
+        CorsConfiguration config = new CorsConfiguration();
+        config.setAllowedOrigins(corsProperties.getOrigins());
+        config.setAllowedMethods(List.of("GET", "POST", "PUT", "DELETE", "OPTIONS"));
+        config.setAllowedHeaders(corsProperties.getHeaders());
+        config.setAllowCredentials(true);
+        config.setMaxAge(3600L);
+        config.setExposedHeaders(List.of("*"));
 
-        HttpServletRequest req = (HttpServletRequest) request;
-        HttpServletResponse res = (HttpServletResponse) response;
+        UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
+        source.registerCorsConfiguration("/**", config);
 
-        res.setHeader("Access-Control-Allow-Methods", "GET, POST, PUT, DELETE, OPTIONS");
-        res.setHeader("Access-Control-Expose-Headers", "*");
-        res.setHeader("Access-Control-Max-Age", "3600");
-        corsProperties.getOrigins().forEach(origin -> {
-            res.addHeader("Access-Control-Allow-Origin", origin);
-        });
-        corsProperties.getHeaders().forEach(header -> {
-            res.addHeader("Access-Control-Allow-Headers", header);
-        });
-
-        chain.doFilter(request, response);
+        return new CorsFilter(source);
     }
+
 }
