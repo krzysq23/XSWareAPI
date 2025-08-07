@@ -43,7 +43,7 @@ public class UserService {
     }
 
     public void createUser(RegisterRequest data) {
-        UserDto user = UserDto.builder().email(data.getEmail()).build();
+        UserDto user = UserDto.fromRegisterRequest(data);
         webClient.post()
                 .uri(createUserPath)
                 .bodyValue(user)

@@ -1,5 +1,7 @@
 package pl.xsware.domain.model;
 
+import jakarta.validation.constraints.Email;
+import jakarta.validation.constraints.NotBlank;
 import lombok.Builder;
 import lombok.Data;
 
@@ -7,8 +9,13 @@ import lombok.Data;
 @Builder
 public class RegisterRequest {
 
-    private String firstName;
-    private String lastName;
+    @NotBlank
+    private String userName;
+    @NotBlank
+    private String login;
+    @NotBlank
+    @Email
     private String email;
+    @NotBlank
     private String password;
 }

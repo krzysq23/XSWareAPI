@@ -31,14 +31,14 @@ public class ApiExceptionHandler {
 
     @ExceptionHandler(UsernameNotFoundException.class)
     public ResponseEntity<ErrorResponse> handleUsernameNotFoundException(UsernameNotFoundException ex) {
-        ErrorResponse error = ErrorResponse.parseStringResponse(ex.getMessage(), HttpStatus.NOT_FOUND);
+        ErrorResponse error = ErrorResponse.parseStringResponse("Wystąpił niespodziewany błąd!", HttpStatus.NOT_FOUND);
         return new ResponseEntity<>(error, HttpStatus.NOT_FOUND);
     }
 
     @ExceptionHandler(Exception.class)
     public ResponseEntity<ErrorResponse> handleGenericException(Exception ex) {
         log.error("Błąd serwera", ex);
-        ErrorResponse error = ErrorResponse.parseStringResponse(ex.getMessage(), HttpStatus.NOT_FOUND);
+        ErrorResponse error = ErrorResponse.parseStringResponse("Wystąpił niespodziewany błąd!", HttpStatus.NOT_FOUND);
         return new ResponseEntity<>(error, HttpStatus.NOT_FOUND);
     }
 

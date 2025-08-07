@@ -1,5 +1,6 @@
 package pl.xsware.api;
 
+import jakarta.validation.Valid;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -39,7 +40,7 @@ public class AuthenticateController {
     }
 
     @PostMapping("/register")
-    public ResponseEntity<Response> registerUser(@RequestBody RegisterRequest data) {
+    public ResponseEntity<Response> registerUser(@RequestBody @Valid RegisterRequest data) {
         userService.createUser(data);
         return ResponseEntity.ok(Response.create("Utowrzono użytkownika"));
     }

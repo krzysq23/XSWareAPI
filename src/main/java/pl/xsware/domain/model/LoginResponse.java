@@ -9,16 +9,12 @@ import pl.xsware.domain.model.user.UserDto;
 public class LoginResponse {
 
     private String token;
-    private String email;
-    private String firstName;
-    private String lastName;
+    private UserDto user;
 
     public static LoginResponse create(UserDto user, String jwtToken) {
         return LoginResponse.builder()
                 .token(jwtToken)
-                .email(user.getEmail())
-                .firstName(user.getFirstName())
-                .lastName(user.getLastName())
+                .user(user)
                 .build();
     }
 }
