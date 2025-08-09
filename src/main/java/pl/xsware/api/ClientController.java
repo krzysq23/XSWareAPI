@@ -30,6 +30,12 @@ public class ClientController {
         return ResponseEntity.ok(user);
     }
 
+    @PostMapping("/exist")
+    public ResponseEntity<Boolean> existUser(@RequestBody @Valid UserRequest user) {
+        boolean exist = userService.existUser(user);
+        return ResponseEntity.ok(exist);
+    }
+
     @PostMapping("/add")
     public ResponseEntity<Response> createUser(@RequestBody @Valid UserRequest user) {
         userService.createUser(user);
@@ -43,9 +49,8 @@ public class ClientController {
     }
 
     @GetMapping("/remove/{id}")
-    public ResponseEntity<UserDto> removeClient(@PathVariable Long id) {
-        UserDto user = userService.getUserById(id);
-        userService.removeUser(user);
-        return ResponseEntity.ok(user);
+    public ResponseEntity<Response>  removeClient(@PathVariable Long id) {
+        userService.removeUser(id);
+        return ResponseEntity.ok(Response.create("OK"));
     }
 }
