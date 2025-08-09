@@ -24,7 +24,7 @@ public class ClientController {
         return ResponseEntity.ok(users);
     }
 
-    @GetMapping
+    @GetMapping("/get/{id}")
     public ResponseEntity<UserDto> getClient(@PathVariable Long id) {
         UserDto user = userService.getUserById(id);
         return ResponseEntity.ok(user);
