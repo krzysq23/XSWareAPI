@@ -66,13 +66,15 @@ public class UserService {
                 .block();
     }
 
-    public boolean existUser(@Valid UserRequest user) {
+    public boolean existUser(String login) {
         return Boolean.TRUE.equals(
                 webClient.post()
-                        .uri(userExistPath)
-                        .bodyValue(user)
+                        .uri(uriBuilder -> uriBuilder
+                                .path(userExistPath)
+                                .build(login)
+                        )
                         .httpRequest(request ->
-                                log.info("\nREQUEST: {} {}, \nbody: {}", request.getMethod(), request.getURI(), user))
+                                log.info("\nREQUEST: {} {}, \nlogin: {}", request.getMethod(), request.getURI(), login))
                         .retrieve()
                         .bodyToMono(Boolean.class)
                         .onErrorResume(WebClientResponseException.class, WebClientErrorHandler::handle)

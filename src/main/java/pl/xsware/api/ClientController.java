@@ -30,9 +30,9 @@ public class ClientController {
         return ResponseEntity.ok(user);
     }
 
-    @PostMapping("/exist")
-    public ResponseEntity<Boolean> existUser(@RequestBody @Valid UserRequest user) {
-        boolean exist = userService.existUser(user);
+    @PostMapping("/exist/{login}")
+    public ResponseEntity<Boolean> existUser(@PathVariable String login) {
+        boolean exist = userService.existUser(login);
         return ResponseEntity.ok(exist);
     }
 
