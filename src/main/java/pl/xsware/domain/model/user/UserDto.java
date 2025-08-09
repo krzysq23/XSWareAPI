@@ -3,7 +3,6 @@ package pl.xsware.domain.model.user;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import lombok.Builder;
 import lombok.Data;
-import pl.xsware.domain.model.RegisterRequest;
 
 import java.util.List;
 
@@ -19,7 +18,7 @@ public class UserDto {
     private String password;
     private List<RoleDto> roles;
 
-    public static UserDto fromRegisterRequest(RegisterRequest request) {
+    public static UserDto fromRegisterRequest(UserRequest request) {
         return UserDto.builder()
                 .userName(request.getUserName())
                 .login(request.getLogin())

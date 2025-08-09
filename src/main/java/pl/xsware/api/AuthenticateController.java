@@ -9,9 +9,9 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.web.bind.annotation.*;
-import pl.xsware.domain.model.LoginRequest;
-import pl.xsware.domain.model.LoginResponse;
-import pl.xsware.domain.model.RegisterRequest;
+import pl.xsware.domain.model.auth.LoginRequest;
+import pl.xsware.domain.model.auth.LoginResponse;
+import pl.xsware.domain.model.user.UserRequest;
 import pl.xsware.domain.model.Response;
 import pl.xsware.domain.model.user.UserDto;
 import pl.xsware.domain.service.UserService;
@@ -40,7 +40,7 @@ public class AuthenticateController {
     }
 
     @PostMapping("/register")
-    public ResponseEntity<Response> registerUser(@RequestBody @Valid RegisterRequest data) {
+    public ResponseEntity<Response> registerUser(@RequestBody @Valid UserRequest data) {
         userService.createUser(data);
         return ResponseEntity.ok(Response.create("Utowrzono użytkownika"));
     }

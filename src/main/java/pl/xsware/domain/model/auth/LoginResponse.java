@@ -1,4 +1,4 @@
-package pl.xsware.domain.model;
+package pl.xsware.domain.model.auth;
 
 import lombok.Builder;
 import lombok.Data;

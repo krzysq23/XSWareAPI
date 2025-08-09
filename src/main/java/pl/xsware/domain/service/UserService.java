@@ -1,5 +1,6 @@
 package pl.xsware.domain.service;
 
+import jakarta.validation.Valid;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -8,10 +9,13 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.client.HttpClientErrorException;
 import org.springframework.web.reactive.function.client.WebClient;
 import org.springframework.web.reactive.function.client.WebClientResponseException;
-import pl.xsware.domain.model.LoginRequest;
-import pl.xsware.domain.model.RegisterRequest;
+import pl.xsware.domain.model.auth.LoginRequest;
+import pl.xsware.domain.model.user.UserRequest;
 import pl.xsware.domain.model.user.UserDto;
 import reactor.core.publisher.Mono;
+
+import java.util.ArrayList;
+import java.util.List;
 
 @Service
 public class UserService {
@@ -42,7 +46,7 @@ public class UserService {
                 .block();
     }
 
-    public void createUser(RegisterRequest data) {
+    public void createUser(UserRequest data) {
         UserDto user = UserDto.fromRegisterRequest(data);
         webClient.post()
                 .uri(createUserPath)
@@ -57,4 +61,17 @@ public class UserService {
                 .block();
     }
 
+    public List<UserDto> getAllUsers() {
+        return new ArrayList<UserDto>();
+    }
+
+    public UserDto getUserById(Long id) {
+        return null;
+    }
+
+    public void editUser(@Valid UserRequest user) {
+    }
+
+    public void removeUser(UserDto user) {
+    }
 }

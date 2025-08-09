@@ -1,4 +1,4 @@
-package pl.xsware.domain.model;
+package pl.xsware.domain.model.user;
 
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
@@ -7,7 +7,7 @@ import lombok.Data;
 
 @Data
 @Builder
-public class RegisterRequest {
+public class UserRequest {
 
     @NotBlank
     private String userName;
