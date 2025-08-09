@@ -16,7 +16,7 @@ public class UserDto {
     private String login;
     private String email;
     private String password;
-    private List<RoleDto> roles;
+    private List<String> roles;
 
     public static UserDto fromRegisterRequest(UserRequest request) {
         return UserDto.builder()
