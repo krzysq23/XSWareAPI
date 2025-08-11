@@ -12,12 +12,16 @@ import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.web.bind.annotation.*;
 import pl.xsware.domain.model.auth.LoginRequest;
 import pl.xsware.domain.model.auth.LoginResponse;
+import pl.xsware.domain.model.user.RoleEnum;
 import pl.xsware.domain.model.user.UserRequest;
 import pl.xsware.domain.model.Response;
 import pl.xsware.domain.model.user.UserDto;
 import pl.xsware.domain.service.AuthService;
 import pl.xsware.domain.service.UserService;
 import pl.xsware.util.JwtUtils;
+
+import java.util.Collections;
+import java.util.List;
 
 @Slf4j
 @RestController

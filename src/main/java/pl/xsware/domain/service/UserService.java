@@ -14,6 +14,7 @@ import org.springframework.web.reactive.function.client.WebClient;
 import org.springframework.web.reactive.function.client.WebClientResponseException;
 import pl.xsware.api.util.WebClientErrorHandler;
 import pl.xsware.domain.model.auth.LoginRequest;
+import pl.xsware.domain.model.user.RoleEnum;
 import pl.xsware.domain.model.user.UserRequest;
 import pl.xsware.domain.model.user.UserDto;
 import reactor.core.publisher.Mono;
@@ -83,6 +84,7 @@ public class UserService {
     }
 
     public void createUser(UserRequest data) {
+        if(data.getRoles() == null) data.setRoles(List.of(RoleEnum.USER.name()));
         UserDto user = UserDto.fromRegisterRequest(data);
         webClient.post()
                 .uri(createUserPath)
