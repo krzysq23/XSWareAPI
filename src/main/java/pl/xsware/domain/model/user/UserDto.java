@@ -20,10 +20,12 @@ public class UserDto {
 
     public static UserDto fromRegisterRequest(UserRequest request) {
         return UserDto.builder()
+                .id(request.getId())
                 .userName(request.getUserName())
                 .login(request.getLogin())
                 .email(request.getEmail())
                 .password(request.getPassword())
+                .roles(request.getRoles())
                 .build();
     }
 }
