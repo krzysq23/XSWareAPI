@@ -95,8 +95,7 @@ public class UserService {
                 .block();
     }
 
-    public void editUser(UserRequest data) {
-        UserDto user = UserDto.fromRegisterRequest(data);
+    public void editUser(UserDto user) {
         webClient.post()
                 .uri(editUserPath)
                 .bodyValue(user)

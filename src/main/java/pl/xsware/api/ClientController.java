@@ -4,6 +4,7 @@ import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import pl.xsware.domain.model.user.PasswordRequest;
 import pl.xsware.domain.model.user.UserRequest;
 import pl.xsware.domain.model.Response;
 import pl.xsware.domain.model.user.UserDto;
@@ -43,7 +44,17 @@ public class ClientController {
     }
 
     @PostMapping("/edit")
-    public ResponseEntity<Response> editUser(@RequestBody @Valid UserRequest user) {
+    public ResponseEntity<Response> editUser(@RequestBody @Valid UserRequest data) {
+        UserDto user = UserDto.fromRegisterRequest(data);
+        user.setPassword("****");
+        userService.editUser(user);
+        return ResponseEntity.ok(Response.create("OK"));
+    }
+
+    @PostMapping("/changePassword")
+    public ResponseEntity<Response> changePassword(@RequestBody @Valid PasswordRequest data) {
+        UserDto user = userService.getUserById(data.getId());
+        user.setPassword(data.getPassword());
         userService.editUser(user);
         return ResponseEntity.ok(Response.create("OK"));
     }
