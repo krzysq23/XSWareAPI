@@ -10,8 +10,10 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.web.bind.annotation.*;
+import pl.xsware.domain.model.auth.ChangePasswordRequest;
 import pl.xsware.domain.model.auth.LoginRequest;
 import pl.xsware.domain.model.auth.LoginResponse;
+import pl.xsware.domain.model.user.PasswordRequest;
 import pl.xsware.domain.model.user.RoleEnum;
 import pl.xsware.domain.model.user.UserRequest;
 import pl.xsware.domain.model.Response;
@@ -69,6 +71,12 @@ public class AuthenticateController {
         return ResponseEntity.ok()
                 .header(HttpHeaders.AUTHORIZATION, "")
                 .build();
+    }
+
+    @PostMapping("/changePassword")
+    public ResponseEntity<Response> changePassword(@RequestBody @Valid ChangePasswordRequest data) {
+        authService.changePassword(data);
+        return ResponseEntity.ok(Response.create("OK"));
     }
 
 }

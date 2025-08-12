@@ -26,17 +26,17 @@ import java.util.List;
 @Service
 public class UserService {
 
-    @Value("${app.service.db-connector.endpoints.user}")
+    @Value("${app.service.db-connector.endpoints.user.getUser}")
     private String getUserPath;
-    @Value("${app.service.db-connector.endpoints.userExist}")
+    @Value("${app.service.db-connector.endpoints.user.userExist}")
     private String userExistPath;
-    @Value("${app.service.db-connector.endpoints.usersAll}")
+    @Value("${app.service.db-connector.endpoints.user.getAllUsers}")
     private String allUsersPath;
-    @Value("${app.service.db-connector.endpoints.userCreate}")
+    @Value("${app.service.db-connector.endpoints.user.userCreate}")
     private String createUserPath;
-    @Value("${app.service.db-connector.endpoints.userEdit}")
+    @Value("${app.service.db-connector.endpoints.user.userEdit}")
     private String editUserPath;
-    @Value("${app.service.db-connector.endpoints.userRemove}")
+    @Value("${app.service.db-connector.endpoints.user.userRemove}")
     private String removeUserPath;
 
     @Autowired
