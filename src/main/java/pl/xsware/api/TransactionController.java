@@ -21,21 +21,25 @@ public class TransactionController {
 
     @GetMapping("/all/{userId}")
     public ResponseEntity<List<Transaction>> getAll(@PathVariable Long userId) {
+        List<Transaction> list = transactionService.getAllTransactions(userId);
         return ResponseEntity.ok(null);
     }
 
     @PostMapping("/add")
-    public ResponseEntity<Response> addCategory(@RequestBody @Valid Transaction data) {
+    public ResponseEntity<Response> addTransaction(@RequestBody @Valid Transaction data) {
+        transactionService.addTransaction(data);
         return ResponseEntity.ok(Response.create("OK"));
     }
 
     @PostMapping("/remove")
-    public ResponseEntity<Response> removeCategory(@RequestBody @Valid Transaction data) {
+    public ResponseEntity<Response> removeTransaction(@RequestBody @Valid Transaction data) {
+        transactionService.removeTransaction(data);
         return ResponseEntity.ok(Response.create("OK"));
     }
 
     @PostMapping("/edit")
-    public ResponseEntity<Response> editCategory(@RequestBody @Valid Transaction data) {
+    public ResponseEntity<Response> editTransaction(@RequestBody @Valid Transaction data) {
+        transactionService.editTransaction(data);
         return ResponseEntity.ok(Response.create("OK"));
     }
 }

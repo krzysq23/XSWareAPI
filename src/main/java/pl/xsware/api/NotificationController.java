@@ -19,16 +19,19 @@ public class NotificationController {
 
     @GetMapping("/all/{userId}")
     public ResponseEntity<List<Notification>> getAll(@PathVariable Long userId) {
+        List<Notification> list = notificationService.getAllNotifications(userId);
         return ResponseEntity.ok(null);
     }
 
     @PostMapping("/remove")
-    public ResponseEntity<Response> removeNotifications(@RequestBody @Valid List<Notification> data) {
+    public ResponseEntity<Response> removeNotifications(@RequestBody @Valid Notification data) {
+        notificationService.removeNotification(data);
         return ResponseEntity.ok(Response.create("OK"));
     }
 
     @PostMapping("/changeAsRead")
     public ResponseEntity<Response> changeAsRead(@RequestBody @Valid List<Notification> data) {
+        notificationService.changeNotificationAsRead(data);
         return ResponseEntity.ok(Response.create("OK"));
     }
 }

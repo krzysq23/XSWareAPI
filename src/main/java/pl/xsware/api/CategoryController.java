@@ -20,21 +20,25 @@ public class CategoryController {
 
     @GetMapping("/all/{userId}")
     public ResponseEntity<List<Category>> getAll(@PathVariable Long userId) {
+        List<Category> list = categoryService.getAllCategory(userId);
         return ResponseEntity.ok(null);
     }
 
     @PostMapping("/add")
     public ResponseEntity<Response> addCategory(@RequestBody @Valid Category data) {
+        categoryService.addCategory(data);
         return ResponseEntity.ok(Response.create("OK"));
     }
 
     @PostMapping("/remove")
     public ResponseEntity<Response> removeCategory(@RequestBody @Valid Category data) {
+        categoryService.removeCategory(data);
         return ResponseEntity.ok(Response.create("OK"));
     }
 
     @PostMapping("/edit")
     public ResponseEntity<Response> editCategory(@RequestBody @Valid Category data) {
+        categoryService.editCategory(data);
         return ResponseEntity.ok(Response.create("OK"));
     }
 }

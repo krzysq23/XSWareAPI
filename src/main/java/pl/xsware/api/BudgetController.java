@@ -19,21 +19,25 @@ public class BudgetController {
 
     @GetMapping("/all/{userId}")
     public ResponseEntity<List<BudgetLimit>> getAll(@PathVariable Long userId) {
-        return ResponseEntity.ok(null);
+        List<BudgetLimit> list = budgetService.getAlLBudgets(userId);
+        return ResponseEntity.ok(list);
     }
 
     @PostMapping("/add")
     public ResponseEntity<Response> addBudget(@RequestBody @Valid BudgetLimit data) {
+        budgetService.addBudget(data);
         return ResponseEntity.ok(Response.create("OK"));
     }
 
     @PostMapping("/remove")
     public ResponseEntity<Response> removeBudget(@RequestBody @Valid BudgetLimit data) {
+        budgetService.removeBudget(data);
         return ResponseEntity.ok(Response.create("OK"));
     }
 
     @PostMapping("/edit")
     public ResponseEntity<Response> editBudget(@RequestBody @Valid BudgetLimit data) {
+        budgetService.editBudget(data);
         return ResponseEntity.ok(Response.create("OK"));
     }
 }
