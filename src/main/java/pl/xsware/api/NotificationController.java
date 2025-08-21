@@ -20,7 +20,7 @@ public class NotificationController {
     @GetMapping("/all/{userId}")
     public ResponseEntity<List<Notification>> getAll(@PathVariable Long userId) {
         List<Notification> list = notificationService.getAllNotifications(userId);
-        return ResponseEntity.ok(null);
+        return ResponseEntity.ok(list);
     }
 
     @PostMapping("/remove")

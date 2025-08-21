@@ -22,7 +22,7 @@ public class TransactionController {
     @GetMapping("/all/{userId}")
     public ResponseEntity<List<Transaction>> getAll(@PathVariable Long userId) {
         List<Transaction> list = transactionService.getAllTransactions(userId);
-        return ResponseEntity.ok(null);
+        return ResponseEntity.ok(list);
     }
 
     @PostMapping("/add")

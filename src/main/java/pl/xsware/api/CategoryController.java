@@ -21,7 +21,7 @@ public class CategoryController {
     @GetMapping("/all/{userId}")
     public ResponseEntity<List<Category>> getAll(@PathVariable Long userId) {
         List<Category> list = categoryService.getAllCategory(userId);
-        return ResponseEntity.ok(null);
+        return ResponseEntity.ok(list);
     }
 
     @PostMapping("/add")
