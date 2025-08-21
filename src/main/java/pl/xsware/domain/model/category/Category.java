@@ -14,5 +14,6 @@ public class Category {
     private String name;
     private CategoryType type;
     private String color;
+    private String icon;
     private Instant createdAt;
 }
