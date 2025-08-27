@@ -12,6 +12,7 @@ import pl.xsware.api.util.WebClientErrorHandler;
 import pl.xsware.domain.model.category.Category;
 import pl.xsware.domain.model.user.UserDto;
 
+import java.time.Instant;
 import java.util.List;
 
 @Slf4j
@@ -45,6 +46,7 @@ public class CategoryService {
     }
 
     public void addCategory(@Valid Category data) {
+        data.setCreatedAt(Instant.now());
         webClient.post()
                 .uri(addPath)
                 .bodyValue(data)
@@ -60,7 +62,9 @@ public class CategoryService {
         webClient.get()
                 .uri(uriBuilder -> uriBuilder
                         .path(removePath)
-                        .build(data.getId(), data.getUserId())
+                        .queryParam("categoryId", data.getId())
+                        .queryParam("userId", data.getUserId())
+                        .build()
                 )
                 .httpRequest(request ->
                         log.info("\nREQUEST: {} {}, \nID: {}, userId: {}", request.getMethod(), request.getURI(), data.getId(), data.getUserId()))

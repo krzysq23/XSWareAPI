@@ -60,7 +60,9 @@ public class BudgetService {
         webClient.get()
                 .uri(uriBuilder -> uriBuilder
                         .path(removePath)
-                        .build(data.getId(), data.getUserId())
+                        .queryParam("budgetId", data.getId())
+                        .queryParam("userId", data.getUserId())
+                        .build()
                 )
                 .httpRequest(request ->
                         log.info("\nREQUEST: {} {}, \nID: {}, userId: {}", request.getMethod(), request.getURI(), data.getId(), data.getUserId()))
