@@ -20,7 +20,7 @@ public class TransactionController {
     @Autowired
     private TransactionService transactionService;
 
-    @PostMapping("/")
+    @PostMapping("/getByDate")
     public ResponseEntity<List<Transaction>> getAll(@RequestBody @Valid TransactionRequest data) {
         List<Transaction> list = transactionService.getTransactions(data);
         return ResponseEntity.ok(list);
