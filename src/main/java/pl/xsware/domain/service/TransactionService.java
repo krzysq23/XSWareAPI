@@ -10,6 +10,7 @@ import org.springframework.web.reactive.function.client.WebClient;
 import org.springframework.web.reactive.function.client.WebClientResponseException;
 import pl.xsware.api.util.WebClientErrorHandler;
 import pl.xsware.domain.model.transaction.Transaction;
+import pl.xsware.domain.model.transaction.TransactionRequest;
 import pl.xsware.domain.model.user.UserDto;
 
 import java.util.List;
@@ -19,7 +20,7 @@ import java.util.List;
 public class TransactionService {
 
     @Value("${app.service.db-connector.endpoints.transaction.getAll}")
-    private String getAllPath;
+    private String getTransactionsPath;
     @Value("${app.service.db-connector.endpoints.transaction.add}")
     private String addPath;
     @Value("${app.service.db-connector.endpoints.transaction.remove}")
@@ -30,14 +31,12 @@ public class TransactionService {
     @Autowired
     private WebClient webClient;
 
-    public List<Transaction> getAllTransactions(Long userId) {
-        return webClient.get()
-                .uri(uriBuilder -> uriBuilder
-                        .path(getAllPath)
-                        .build(userId)
-                )
+    public List<Transaction> getTransactions(TransactionRequest data) {
+        return webClient.post()
+                .uri(getTransactionsPath)
+                .bodyValue(data)
                 .httpRequest(request ->
-                        log.info("\nREQUEST: {} {}", request.getMethod(), request.getURI()))
+                        log.info("\nREQUEST: {} {}, \nbody: {}", request.getMethod(), request.getURI(), data))
                 .retrieve()
                 .bodyToMono(new ParameterizedTypeReference<List<Transaction>>() {})
                 .onErrorResume(WebClientResponseException.class, WebClientErrorHandler::handle)

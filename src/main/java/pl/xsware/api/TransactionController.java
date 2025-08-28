@@ -7,6 +7,7 @@ import org.springframework.web.bind.annotation.*;
 import pl.xsware.domain.model.Response;
 import pl.xsware.domain.model.category.Category;
 import pl.xsware.domain.model.transaction.Transaction;
+import pl.xsware.domain.model.transaction.TransactionRequest;
 import pl.xsware.domain.service.CategoryService;
 import pl.xsware.domain.service.TransactionService;
 
@@ -19,9 +20,9 @@ public class TransactionController {
     @Autowired
     private TransactionService transactionService;
 
-    @GetMapping("/all/{userId}")
-    public ResponseEntity<List<Transaction>> getAll(@PathVariable Long userId) {
-        List<Transaction> list = transactionService.getAllTransactions(userId);
+    @PostMapping("/")
+    public ResponseEntity<List<Transaction>> getAll(@RequestBody @Valid TransactionRequest data) {
+        List<Transaction> list = transactionService.getTransactions(data);
         return ResponseEntity.ok(list);
     }
 
