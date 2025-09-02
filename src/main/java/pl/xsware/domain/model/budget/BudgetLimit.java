@@ -37,6 +37,7 @@ public class BudgetLimit {
                 .multiply(new BigDecimal("100"))
                 .divide(amountLimit, 2, RoundingMode.HALF_UP);
         this.status = BudgetStatus.calculate(percentSpent);
+        this.percentSpent = percentSpent.intValue();
     }
 
 }
