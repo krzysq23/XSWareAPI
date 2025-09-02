@@ -29,21 +29,14 @@ public class BudgetLimit {
 
     public void calculateBudgetStatus() {
         if (amountLimit == null || amountSpent == null) {
-            this.status = BudgetStatus.UNKNOWN;
+            this.status = BudgetStatus.calculate(null);
             this.percentSpent = 0;
             return;
         }
         BigDecimal percentSpent = amountSpent
                 .multiply(new BigDecimal("100"))
                 .divide(amountLimit, 2, RoundingMode.HALF_UP);
-        if (percentSpent.compareTo(new BigDecimal("80")) < 0) {
-            this.status = BudgetStatus.OK;
-        } else if (percentSpent.compareTo(new BigDecimal("100")) > 0) {
-            this.status = BudgetStatus.EXCEEDED;
-        } else {
-            this.status = BudgetStatus.NEAR_LIMIT;
-        }
-        this.percentSpent = percentSpent.intValue();
+        this.status = BudgetStatus.calculate(percentSpent);
     }
 
 }
