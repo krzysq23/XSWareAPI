@@ -1,7 +1,6 @@
 package pl.xsware.domain.model.budget;
 
 import java.math.BigDecimal;
-import java.math.RoundingMode;
 
 public enum BudgetStatus {
     OK,
