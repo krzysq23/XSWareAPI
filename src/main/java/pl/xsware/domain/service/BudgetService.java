@@ -49,14 +49,6 @@ public class BudgetService {
     }
 
     public void addBudget(@Valid BudgetLimit data) {
-        switch (data.getPeriodType()) {
-            case YEARLY:
-                data.setEndDate(data.getStartDate().plusYears(1));
-                break;
-            case MONTHLY:
-                data.setEndDate(data.getStartDate().plusMonths(1));
-                break;
-        }
         webClient.post()
                 .uri(addPath)
                 .bodyValue(data)
@@ -85,14 +77,6 @@ public class BudgetService {
     }
 
     public void editBudget(@Valid BudgetLimit data) {
-        switch (data.getPeriodType()) {
-            case YEARLY:
-                data.setEndDate(data.getStartDate().plusYears(1));
-                break;
-            case MONTHLY:
-                data.setEndDate(data.getStartDate().plusMonths(1));
-                break;
-        }
         webClient.post()
                 .uri(editPath)
                 .bodyValue(data)
