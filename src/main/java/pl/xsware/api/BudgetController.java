@@ -6,6 +6,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import pl.xsware.domain.model.Response;
 import pl.xsware.domain.model.budget.BudgetLimit;
+import pl.xsware.domain.model.budget.BudgetRequest;
 import pl.xsware.domain.service.BudgetService;
 
 import java.util.List;
@@ -17,9 +18,9 @@ public class BudgetController {
     @Autowired
     private BudgetService budgetService;
 
-    @GetMapping("/all/{userId}")
-    public ResponseEntity<List<BudgetLimit>> getAll(@PathVariable Long userId) {
-        List<BudgetLimit> list = budgetService.getAlLBudgets(userId);
+    @PostMapping("/getBudgets")
+    public ResponseEntity<List<BudgetLimit>> getBudgets(@RequestBody @Valid BudgetRequest data) {
+        List<BudgetLimit> list = budgetService.getBudgetByPeriodType(data);
         return ResponseEntity.ok(list);
     }
 

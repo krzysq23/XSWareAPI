@@ -10,6 +10,8 @@ import org.springframework.web.reactive.function.client.WebClient;
 import org.springframework.web.reactive.function.client.WebClientResponseException;
 import pl.xsware.api.util.WebClientErrorHandler;
 import pl.xsware.domain.model.budget.BudgetLimit;
+import pl.xsware.domain.model.budget.BudgetRequest;
+import pl.xsware.domain.model.budget.PeriodType;
 import pl.xsware.domain.model.user.UserDto;
 
 import java.util.List;
@@ -18,8 +20,8 @@ import java.util.List;
 @Service
 public class BudgetService {
 
-    @Value("${app.service.db-connector.endpoints.budget.getAll}")
-    private String getAllPath;
+    @Value("${app.service.db-connector.endpoints.budget.getBudgets}")
+    private String getBudgetsPath;
     @Value("${app.service.db-connector.endpoints.budget.add}")
     private String addPath;
     @Value("${app.service.db-connector.endpoints.budget.remove}")
@@ -30,21 +32,31 @@ public class BudgetService {
     @Autowired
     private WebClient webClient;
 
-    public List<BudgetLimit> getAlLBudgets(Long userId) {
-        return webClient.get()
-                .uri(uriBuilder -> uriBuilder
-                        .path(getAllPath)
-                        .build(userId)
-                )
+    public List<BudgetLimit> getBudgetByPeriodType(BudgetRequest data) {
+        return webClient.post()
+                .uri(getBudgetsPath)
+                .bodyValue(data)
                 .httpRequest(request ->
-                        log.info("\nREQUEST: {} {}", request.getMethod(), request.getURI()))
+                        log.info("\nREQUEST: {} {}, \nbody: {}", request.getMethod(), request.getURI(), data))
                 .retrieve()
                 .bodyToMono(new ParameterizedTypeReference<List<BudgetLimit>>() {})
+                .map(list -> {
+                    list.forEach(BudgetLimit::calculateBudgetStatus);
+                    return list;
+                })
                 .onErrorResume(WebClientResponseException.class, WebClientErrorHandler::handle)
                 .block();
     }
 
     public void addBudget(@Valid BudgetLimit data) {
+        switch (data.getPeriodType()) {
+            case YEARLY:
+                data.setEndDate(data.getStartDate().plusYears(1));
+                break;
+            case MONTHLY:
+                data.setEndDate(data.getStartDate().plusMonths(1));
+                break;
+        }
         webClient.post()
                 .uri(addPath)
                 .bodyValue(data)
@@ -73,6 +85,14 @@ public class BudgetService {
     }
 
     public void editBudget(@Valid BudgetLimit data) {
+        switch (data.getPeriodType()) {
+            case YEARLY:
+                data.setEndDate(data.getStartDate().plusYears(1));
+                break;
+            case MONTHLY:
+                data.setEndDate(data.getStartDate().plusMonths(1));
+                break;
+        }
         webClient.post()
                 .uri(editPath)
                 .bodyValue(data)
