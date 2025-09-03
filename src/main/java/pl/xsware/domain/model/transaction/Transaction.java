@@ -2,6 +2,7 @@ package pl.xsware.domain.model.transaction;
 
 import lombok.Builder;
 import lombok.Data;
+import pl.xsware.domain.model.category.CategoryType;
 
 import java.math.BigDecimal;
 import java.time.Instant;
@@ -17,6 +18,7 @@ public class Transaction {
     private BigDecimal amount;
     private LocalDate date;
     private String description;
+    private CategoryType type;
     private Instant createdAt;
     private Instant updatedAt;
 }
