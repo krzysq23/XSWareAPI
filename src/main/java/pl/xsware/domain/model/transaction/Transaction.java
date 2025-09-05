@@ -15,6 +15,7 @@ public class Transaction {
     private Long id;
     private Long userId;
     private Long categoryId;
+    private String categoryName;
     private BigDecimal amount;
     private LocalDate date;
     private String description;

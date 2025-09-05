@@ -5,7 +5,6 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
-import pl.xsware.config.auth.CurrentUserProvider;
 import pl.xsware.domain.model.dashboard.Dashboard;
 import pl.xsware.domain.service.DashboardService;
 
