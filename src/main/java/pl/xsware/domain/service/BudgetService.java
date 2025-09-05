@@ -9,6 +9,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.reactive.function.client.WebClient;
 import org.springframework.web.reactive.function.client.WebClientResponseException;
 import pl.xsware.api.util.WebClientErrorHandler;
+import pl.xsware.config.auth.CurrentUserProvider;
 import pl.xsware.domain.model.budget.BudgetLimit;
 import pl.xsware.domain.model.budget.BudgetRequest;
 import pl.xsware.domain.model.budget.PeriodType;
@@ -30,9 +31,12 @@ public class BudgetService {
     private String editPath;
 
     @Autowired
+    private CurrentUserProvider currentUserProvider;
+    @Autowired
     private WebClient webClient;
 
     public List<BudgetLimit> getBudgetByPeriodType(BudgetRequest data) {
+        data.setUserId(currentUserProvider.getCurrentUserId());
         return webClient.post()
                 .uri(getBudgetsPath)
                 .bodyValue(data)
@@ -49,6 +53,7 @@ public class BudgetService {
     }
 
     public void addBudget(@Valid BudgetLimit data) {
+        data.setUserId(currentUserProvider.getCurrentUserId());
         webClient.post()
                 .uri(addPath)
                 .bodyValue(data)
@@ -61,6 +66,7 @@ public class BudgetService {
     }
 
     public void removeBudget(@Valid BudgetLimit data) {
+        data.setUserId(currentUserProvider.getCurrentUserId());
         webClient.get()
                 .uri(uriBuilder -> uriBuilder
                         .path(removePath)
@@ -77,6 +83,7 @@ public class BudgetService {
     }
 
     public void editBudget(@Valid BudgetLimit data) {
+        data.setUserId(currentUserProvider.getCurrentUserId());
         webClient.post()
                 .uri(editPath)
                 .bodyValue(data)

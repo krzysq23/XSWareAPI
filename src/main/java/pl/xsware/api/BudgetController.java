@@ -4,6 +4,7 @@ import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import pl.xsware.config.auth.CurrentUserProvider;
 import pl.xsware.domain.model.Response;
 import pl.xsware.domain.model.budget.BudgetLimit;
 import pl.xsware.domain.model.budget.BudgetRequest;
