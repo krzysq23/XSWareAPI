@@ -9,6 +9,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.reactive.function.client.WebClient;
 import org.springframework.web.reactive.function.client.WebClientResponseException;
 import pl.xsware.api.util.WebClientErrorHandler;
+import pl.xsware.config.auth.CurrentUserProvider;
 import pl.xsware.domain.model.category.Category;
 import pl.xsware.domain.model.user.UserDto;
 
@@ -29,13 +30,15 @@ public class CategoryService {
     private String editPath;
 
     @Autowired
+    private CurrentUserProvider currentUserProvider;
+    @Autowired
     private WebClient webClient;
 
-    public List<Category> getAllCategory(Long userId) {
+    public List<Category> getAllCategory() {
         return webClient.get()
                 .uri(uriBuilder -> uriBuilder
                         .path(getAllPath)
-                        .build(userId)
+                        .build(currentUserProvider.getCurrentUserId())
                 )
                 .httpRequest(request ->
                         log.info("\nREQUEST: {} {}", request.getMethod(), request.getURI()))

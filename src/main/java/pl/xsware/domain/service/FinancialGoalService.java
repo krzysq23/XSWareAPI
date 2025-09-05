@@ -9,6 +9,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.reactive.function.client.WebClient;
 import org.springframework.web.reactive.function.client.WebClientResponseException;
 import pl.xsware.api.util.WebClientErrorHandler;
+import pl.xsware.config.auth.CurrentUserProvider;
 import pl.xsware.domain.model.Response;
 import pl.xsware.domain.model.financialGoal.FinancialGoal;
 
@@ -28,13 +29,15 @@ public class FinancialGoalService {
     private String editPath;
 
     @Autowired
+    private CurrentUserProvider currentUserProvider;
+    @Autowired
     private WebClient webClient;
 
-    public List<FinancialGoal> getAllFinancialGoals(Long userId) {
+    public List<FinancialGoal> getAllFinancialGoals() {
         return webClient.get()
                 .uri(uriBuilder -> uriBuilder
                         .path(getAllPath)
-                        .build(userId)
+                        .build(currentUserProvider.getCurrentUserId())
                 )
                 .httpRequest(request ->
                         log.info("\nREQUEST: {} {}", request.getMethod(), request.getURI()))

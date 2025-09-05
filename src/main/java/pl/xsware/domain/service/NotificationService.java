@@ -9,6 +9,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.reactive.function.client.WebClient;
 import org.springframework.web.reactive.function.client.WebClientResponseException;
 import pl.xsware.api.util.WebClientErrorHandler;
+import pl.xsware.config.auth.CurrentUserProvider;
 import pl.xsware.domain.model.notification.Notification;
 import pl.xsware.domain.model.user.UserDto;
 
@@ -28,13 +29,15 @@ public class NotificationService {
     private String changeAsReadPath;
 
     @Autowired
+    private CurrentUserProvider currentUserProvider;
+    @Autowired
     private WebClient webClient;
 
-    public List<Notification> getAllNotifications(Long userId) {
+    public List<Notification> getAllNotifications() {
         return webClient.get()
                 .uri(uriBuilder -> uriBuilder
                         .path(getAllPath)
-                        .build(userId)
+                        .build(currentUserProvider.getCurrentUserId())
                 )
                 .httpRequest(request ->
                         log.info("\nREQUEST: {} {}", request.getMethod(), request.getURI()))

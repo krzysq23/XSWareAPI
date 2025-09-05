@@ -53,7 +53,6 @@ public class BudgetService {
     }
 
     public void addBudget(@Valid BudgetLimit data) {
-        data.setUserId(currentUserProvider.getCurrentUserId());
         webClient.post()
                 .uri(addPath)
                 .bodyValue(data)
@@ -66,7 +65,6 @@ public class BudgetService {
     }
 
     public void removeBudget(@Valid BudgetLimit data) {
-        data.setUserId(currentUserProvider.getCurrentUserId());
         webClient.get()
                 .uri(uriBuilder -> uriBuilder
                         .path(removePath)
@@ -83,7 +81,6 @@ public class BudgetService {
     }
 
     public void editBudget(@Valid BudgetLimit data) {
-        data.setUserId(currentUserProvider.getCurrentUserId());
         webClient.post()
                 .uri(editPath)
                 .bodyValue(data)

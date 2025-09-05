@@ -9,6 +9,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.reactive.function.client.WebClient;
 import org.springframework.web.reactive.function.client.WebClientResponseException;
 import pl.xsware.api.util.WebClientErrorHandler;
+import pl.xsware.config.auth.CurrentUserProvider;
 import pl.xsware.domain.model.transaction.Transaction;
 import pl.xsware.domain.model.transaction.TransactionRequest;
 import pl.xsware.domain.model.user.UserDto;
@@ -29,9 +30,12 @@ public class TransactionService {
     private String editPath;
 
     @Autowired
+    private CurrentUserProvider currentUserProvider;
+    @Autowired
     private WebClient webClient;
 
     public List<Transaction> getTransactions(TransactionRequest data) {
+        data.setUserId(currentUserProvider.getCurrentUserId());
         return webClient.post()
                 .uri(getTransactionsPath)
                 .bodyValue(data)

@@ -3,12 +3,13 @@ package pl.xsware.api;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
 import pl.xsware.domain.model.Response;
-import pl.xsware.domain.model.category.Category;
 import pl.xsware.domain.model.transaction.Transaction;
 import pl.xsware.domain.model.transaction.TransactionRequest;
-import pl.xsware.domain.service.CategoryService;
 import pl.xsware.domain.service.TransactionService;
 
 import java.util.List;

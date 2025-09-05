@@ -17,9 +17,9 @@ public class FinancialGoalController {
     @Autowired
     private FinancialGoalService financialGoalService;
 
-    @GetMapping("/all/{userId}")
-    public ResponseEntity<List<FinancialGoal>> getAll(@PathVariable Long userId) {
-        List<FinancialGoal> list = financialGoalService.getAllFinancialGoals(userId);
+    @GetMapping("/all")
+    public ResponseEntity<List<FinancialGoal>> getAll() {
+        List<FinancialGoal> list = financialGoalService.getAllFinancialGoals();
         return ResponseEntity.ok(list);
     }
 
