@@ -12,7 +12,6 @@ import pl.xsware.api.util.WebClientErrorHandler;
 import pl.xsware.config.auth.CurrentUserProvider;
 import pl.xsware.domain.model.budget.BudgetLimit;
 import pl.xsware.domain.model.budget.BudgetRequest;
-import pl.xsware.domain.model.budget.PeriodType;
 import pl.xsware.domain.model.user.UserDto;
 
 import java.util.List;
