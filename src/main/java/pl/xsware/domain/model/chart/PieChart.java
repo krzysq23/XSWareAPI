@@ -1,13 +1,13 @@
-package pl.xsware.domain.model.dashboard;
+package pl.xsware.domain.model.chart;
 
 import lombok.Builder;
 import lombok.Data;
 
 @Data
 @Builder
-public class DashboardChart {
+public class PieChart {
 
-    private String categoryName;
+    private String label;
     private String color;
     private double percent;
 }

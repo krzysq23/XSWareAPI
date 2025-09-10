@@ -5,10 +5,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import pl.xsware.config.auth.CurrentUserProvider;
 import pl.xsware.domain.model.category.CategoryType;
-import pl.xsware.domain.model.chart.PieChart;
-import pl.xsware.domain.model.chart.Colors;
-import pl.xsware.domain.model.dashboard.Dashboard;
-import pl.xsware.domain.model.financialGoal.FinancialGoal;
+import pl.xsware.domain.model.report.Report;
+import pl.xsware.domain.model.report.ReportRequest;
 import pl.xsware.domain.model.transaction.Transaction;
 import pl.xsware.domain.model.transaction.TransactionRange;
 import pl.xsware.domain.model.transaction.TransactionRequest;
@@ -16,47 +14,44 @@ import pl.xsware.util.ChartUtils;
 import pl.xsware.util.TransactionUtils;
 
 import java.math.BigDecimal;
-import java.math.RoundingMode;
 import java.util.List;
 import java.util.Map;
-import java.util.concurrent.atomic.AtomicInteger;
-import java.util.stream.Collectors;
 
 @Slf4j
 @Service
-public class DashboardService
-{
+public class ReportService {
+
     @Autowired
     private CurrentUserProvider currentUserProvider;
     @Autowired
     private TransactionService transactionService;
     @Autowired
-    private FinancialGoalService financialGoalService;
-    @Autowired
     private TransactionUtils transactionUtils;
     @Autowired
     private ChartUtils chartUtils;
 
-    public Dashboard getDashboardInfo() {
-        Dashboard dInfo = Dashboard.builder().build();
+    public Report filter(ReportRequest data) {
+        Report report = new Report();
         List<Transaction> transactions = transactionService.getTransactions(
                 TransactionRequest.builder()
-                        .dateRange(TransactionRange.LAST_MONTH.getValue())
+                        .startDate(data.getDateStart())
+                        .endDate(data.getDateEnd())
                         .build()
         );
-        List<FinancialGoal> financialGoals = financialGoalService.getAllFinancialGoals();
-        dInfo.setFinancialGoals(
-                financialGoals.stream().limit(3).collect(Collectors.toList())
-        );
         BigDecimal balance = transactionUtils.calculateBalance(transactions);
-        dInfo.setBalance(balance);
         BigDecimal totalIncome = transactionUtils.calculateTotalIncome(transactions);
-        dInfo.setTotalIncome(totalIncome);
         BigDecimal totalExpense = transactionUtils.calculateTotalExpense(transactions);
-        dInfo.setTotalExpense(totalExpense);
-        dInfo.setTransactions(transactionUtils.getLimitedTransactions(transactions, 5));
+        report.setTransactions(transactions);
+        report.setBalance(balance);
+        report.setTotalIncome(totalIncome);
+        report.setTotalExpense(totalExpense);
         Map<String, List<Transaction>> groupedByCategory = transactionUtils.groupedByCategory(transactions, CategoryType.EXPENSE);
-        dInfo.setChartData(chartUtils.generateChatDataForTransactions(groupedByCategory, totalIncome));
-        return dInfo;
+        report.setPieChartData(chartUtils.generateChatDataForTransactions(groupedByCategory, totalIncome));
+        report.setLinearChartData(chartUtils.generateLinearChartDataForTransactions(groupedByCategory));
+        return report;
+    }
+
+    public Report generateReport(ReportRequest data) {
+        return new Report();
     }
 }

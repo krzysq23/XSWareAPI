@@ -1,4 +1,4 @@
-package pl.xsware.domain.model.dashboard;
+package pl.xsware.domain.model.chart;
 
 public enum Colors {
      primary,
