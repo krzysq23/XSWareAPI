@@ -8,7 +8,6 @@ import pl.xsware.domain.model.category.CategoryType;
 import pl.xsware.domain.model.report.Report;
 import pl.xsware.domain.model.report.ReportRequest;
 import pl.xsware.domain.model.transaction.Transaction;
-import pl.xsware.domain.model.transaction.TransactionRange;
 import pl.xsware.domain.model.transaction.TransactionRequest;
 import pl.xsware.util.ChartUtils;
 import pl.xsware.util.TransactionUtils;

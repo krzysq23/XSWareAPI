@@ -1,5 +1,6 @@
 package pl.xsware.config.auth;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
@@ -7,24 +8,27 @@ import jakarta.servlet.http.HttpServletResponse;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.MediaType;
+import org.springframework.security.authentication.BadCredentialsException;
+import org.springframework.security.authentication.InsufficientAuthenticationException;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.security.web.authentication.WebAuthenticationDetailsSource;
 import org.springframework.stereotype.Component;
 import org.springframework.web.filter.OncePerRequestFilter;
 import pl.xsware.domain.model.auth.CustomUserDetails;
-import pl.xsware.domain.model.user.UserDto;
+import pl.xsware.domain.model.auth.JwtValidation;
 import pl.xsware.domain.service.UserService;
 import pl.xsware.util.JwtUtils;
 
 import java.io.IOException;
+import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
-import java.util.stream.Collectors;
+import java.util.Map;
 
 @Component
 public class AuthTokenFilter extends OncePerRequestFilter {
@@ -45,9 +49,10 @@ public class AuthTokenFilter extends OncePerRequestFilter {
     ) throws ServletException, IOException
     {
 
-        try {
-            String jwt = parseJwt(request);
-            if (jwt != null && jwtUtils.validateJwtToken(jwt)) {
+        String jwt = parseJwt(request);
+        JwtValidation valid = jwtUtils.validateJwtToken(jwt);
+        switch (valid) {
+            case VALID -> {
                 String email = jwtUtils.getEmailFromJwtToken(jwt);
                 Long userId = jwtUtils.getUserIdFromJwtToken(jwt);
                 List<String> roles = jwtUtils.getRolesFromJwtToken(jwt);
@@ -70,12 +75,30 @@ public class AuthTokenFilter extends OncePerRequestFilter {
                 );
 
                 SecurityContextHolder.getContext().setAuthentication(authentication);
-            }
-        } catch (Exception e) {
-            log.error("Nie udało się uwierzytelnić użytkownika: {}", e.getMessage());
-        }
 
+            }
+            case EXPIRED -> {
+                writeUnauthorized(response, "Sesja wygasła. Zaloguj się ponownie.");
+            }
+            case INVALID -> {
+                writeUnauthorized(response, "Nieprawidłowy token");
+            }
+        }
         filterChain.doFilter(request, response);
+    }
+
+    private void writeUnauthorized(HttpServletResponse response, String message) throws IOException {
+        if (response.isCommitted()) return;
+        response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
+        response.setCharacterEncoding(StandardCharsets.UTF_8.name());
+        response.setContentType(MediaType.APPLICATION_JSON_VALUE);
+        response.setHeader(HttpHeaders.WWW_AUTHENTICATE,
+                "Bearer error=\"invalid_token\", error_description=\"Invalid token\"");
+        new ObjectMapper().writeValue(response.getOutputStream(), Map.of(
+                "status", 401,
+                "error", "Unauthorized",
+                "message", message
+        ));
     }
 
     private String parseJwt(HttpServletRequest request) {

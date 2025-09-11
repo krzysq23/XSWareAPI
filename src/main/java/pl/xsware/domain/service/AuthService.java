@@ -10,8 +10,7 @@ import org.springframework.web.reactive.function.client.WebClientResponseExcepti
 import pl.xsware.api.util.WebClientErrorHandler;
 import pl.xsware.domain.model.Response;
 import pl.xsware.domain.model.auth.ChangePasswordRequest;
-import pl.xsware.domain.model.auth.LoginRequest;
-import pl.xsware.domain.model.user.PasswordRequest;
+import pl.xsware.domain.model.auth.AuthRequest;
 import pl.xsware.domain.model.user.UserDto;
 
 @Slf4j
@@ -26,7 +25,7 @@ public class AuthService {
     @Autowired
     private WebClient webClient;
 
-    public UserDto authenticate(LoginRequest data) {
+    public UserDto authenticate(AuthRequest data) {
         return webClient.post()
                 .uri(authenticatePath)
                 .bodyValue(data)

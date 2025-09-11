@@ -2,8 +2,6 @@ package pl.xsware.api;
 
 import jakarta.validation.Valid;
 import lombok.extern.slf4j.Slf4j;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
@@ -11,19 +9,15 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.web.bind.annotation.*;
 import pl.xsware.domain.model.auth.ChangePasswordRequest;
-import pl.xsware.domain.model.auth.LoginRequest;
-import pl.xsware.domain.model.auth.LoginResponse;
-import pl.xsware.domain.model.user.PasswordRequest;
-import pl.xsware.domain.model.user.RoleEnum;
+import pl.xsware.domain.model.auth.JwtValidation;
+import pl.xsware.domain.model.auth.AuthRequest;
+import pl.xsware.domain.model.auth.AuthResponse;
 import pl.xsware.domain.model.user.UserRequest;
 import pl.xsware.domain.model.Response;
 import pl.xsware.domain.model.user.UserDto;
 import pl.xsware.domain.service.AuthService;
 import pl.xsware.domain.service.UserService;
 import pl.xsware.util.JwtUtils;
-
-import java.util.Collections;
-import java.util.List;
 
 @Slf4j
 @RestController
@@ -44,10 +38,20 @@ public class AuthenticateController {
 
 
     @PostMapping("/login")
-    public ResponseEntity<?> authenticateUser(@RequestBody LoginRequest loginRequest) {
-        UserDto user = authService.authenticate(loginRequest);
-        String jwt = jwtUtils.generateJwtToken(user);
-        return ResponseEntity.ok(LoginResponse.create(user, jwt));
+    public ResponseEntity<AuthResponse> authenticateUser(@RequestBody AuthRequest authRequest) {
+        UserDto user = authService.authenticate(authRequest);
+        String accessToken = jwtUtils.generateJwtToken(user);
+        String refreshToken = jwtUtils.generateRefreshToken(user);
+        return ResponseEntity.ok(AuthResponse.create(user, accessToken, refreshToken));
+    }
+
+    @GetMapping("/refresh")
+    public ResponseEntity<AuthResponse> refreshToken(@RequestHeader("Authorization") String authHeader) {
+        String token = authHeader.replace("Bearer ", "");
+        UserDto user = jwtUtils.getUserFromJwtToken(token);
+        String accessToken = jwtUtils.generateJwtToken(user);
+        String refreshToken = jwtUtils.generateRefreshToken(user);
+        return ResponseEntity.ok(AuthResponse.create(null, accessToken, refreshToken));
     }
 
     @PostMapping("/register")
@@ -59,7 +63,7 @@ public class AuthenticateController {
     @GetMapping("/token/valid")
     public ResponseEntity<Response> tokenValid(@RequestHeader("Authorization") String authHeader) {
         String token = authHeader.replace("Bearer ", "");
-        if (!jwtUtils.validateJwtToken(token)) {
+        if (!jwtUtils.validateJwtToken(token).equals(JwtValidation.VALID)) {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(Response.builder().message("INVALID").build());
         }
         String user = jwtUtils.getEmailFromJwtToken(token);
