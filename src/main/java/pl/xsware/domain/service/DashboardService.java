@@ -48,12 +48,11 @@ public class DashboardService
         dInfo.setFinancialGoals(
                 financialGoals.stream().limit(3).collect(Collectors.toList())
         );
-        BigDecimal balance = transactionUtils.calculateBalance(transactions);
-        dInfo.setBalance(balance);
         BigDecimal totalIncome = transactionUtils.calculateTotalIncome(transactions);
-        dInfo.setTotalIncome(totalIncome);
         BigDecimal totalExpense = transactionUtils.calculateTotalExpense(transactions);
+        dInfo.setTotalIncome(totalIncome);
         dInfo.setTotalExpense(totalExpense);
+        dInfo.setBalance(totalIncome.subtract(totalExpense));
         dInfo.setTransactions(transactionUtils.getLimitedTransactions(transactions, 5));
         Map<String, List<Transaction>> groupedByCategory = transactionUtils.groupedByCategory(transactions, CategoryType.EXPENSE);
         dInfo.setChartData(chartUtils.generateChatDataForTransactions(groupedByCategory, totalIncome));

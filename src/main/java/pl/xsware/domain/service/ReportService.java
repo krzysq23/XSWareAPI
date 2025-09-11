@@ -31,6 +31,9 @@ public class ReportService {
     private ChartUtils chartUtils;
 
     public Report filter(ReportRequest data) {
+        if (data.getDateStart() == null || data.getDateEnd() == null) {
+            throw new IllegalArgumentException("Data nie może być pusta.");
+        }
         Report report = new Report();
         List<Transaction> transactions = transactionService.getTransactions(
                 TransactionRequest.builder()
@@ -38,16 +41,15 @@ public class ReportService {
                         .endDate(data.getDateEnd())
                         .build()
         );
-        BigDecimal balance = transactionUtils.calculateBalance(transactions);
         BigDecimal totalIncome = transactionUtils.calculateTotalIncome(transactions);
         BigDecimal totalExpense = transactionUtils.calculateTotalExpense(transactions);
         report.setTransactions(transactions);
-        report.setBalance(balance);
         report.setTotalIncome(totalIncome);
         report.setTotalExpense(totalExpense);
+        report.setBalance(totalIncome.subtract(totalExpense));
         Map<String, List<Transaction>> groupedByCategory = transactionUtils.groupedByCategory(transactions, CategoryType.EXPENSE);
         report.setPieChartData(chartUtils.generateChatDataForTransactions(groupedByCategory, totalIncome));
-        report.setLinearChartData(chartUtils.generateLinearChartDataForTransactions(groupedByCategory));
+        report.setLinearChartData(chartUtils.generateLinearChartDataForTransactions(transactions, data.getDateStart(), data.getDateEnd(), data.getTransactionType()));
         return report;
     }
 

@@ -15,7 +15,10 @@ public class TransactionUtils {
 
     public BigDecimal calculateBalance(List<Transaction> transactions) {
         return transactions.stream()
-                .map(Transaction::getAmount)
+                .map(t -> switch (t.getType()) {
+                    case INCOME -> t.getAmount();
+                    case EXPENSE -> t.getAmount().negate();
+                })
                 .reduce(BigDecimal.ZERO, BigDecimal::add);
     }
 
