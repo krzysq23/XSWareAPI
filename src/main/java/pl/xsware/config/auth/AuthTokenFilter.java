@@ -18,8 +18,10 @@ import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Component;
+import org.springframework.util.AntPathMatcher;
 import org.springframework.web.filter.OncePerRequestFilter;
 import pl.xsware.domain.model.auth.CustomUserDetails;
+import pl.xsware.domain.model.auth.JwtType;
 import pl.xsware.domain.model.auth.JwtValidation;
 import pl.xsware.domain.service.UserService;
 import pl.xsware.util.JwtUtils;
@@ -39,7 +41,18 @@ public class AuthTokenFilter extends OncePerRequestFilter {
     @Autowired
     private UserService userService;
 
+    private static final AntPathMatcher PATH_MATCHER = new AntPathMatcher();
+
     private final Logger log = LoggerFactory.getLogger(AuthTokenFilter.class);
+
+    @Override
+    protected boolean shouldNotFilter(HttpServletRequest request) {
+        String path = request.getServletPath();
+        return PATH_MATCHER.match("/auth/**", path)
+                || PATH_MATCHER.match("/public/**", path)
+                || PATH_MATCHER.match("/error", path)
+                || "OPTIONS".equalsIgnoreCase(request.getMethod());
+    }
 
     @Override
     protected void doFilterInternal(
@@ -50,7 +63,7 @@ public class AuthTokenFilter extends OncePerRequestFilter {
     {
 
         String jwt = parseJwt(request);
-        JwtValidation valid = jwtUtils.validateJwtToken(jwt);
+        JwtValidation valid = jwtUtils.validateJwtToken(jwt, JwtType.ACCESS);
         switch (valid) {
             case VALID -> {
                 String email = jwtUtils.getEmailFromJwtToken(jwt);
@@ -78,10 +91,12 @@ public class AuthTokenFilter extends OncePerRequestFilter {
 
             }
             case EXPIRED -> {
-                writeUnauthorized(response, "Sesja wygasła. Zaloguj się ponownie.");
+                writeUnauthorized(response, JwtValidation.EXPIRED.getLabel());
+                return;
             }
-            case INVALID -> {
-                writeUnauthorized(response, "Nieprawidłowy token");
+            case INVALID, NONE -> {
+                writeUnauthorized(response, JwtValidation.INVALID.getLabel());
+                return;
             }
         }
         filterChain.doFilter(request, response);
@@ -103,9 +118,8 @@ public class AuthTokenFilter extends OncePerRequestFilter {
 
     private String parseJwt(HttpServletRequest request) {
         String headerAuth = request.getHeader("Authorization");
-        String path = request.getRequestURI();
 
-        if (headerAuth != null && headerAuth.startsWith("Bearer ") && !path.startsWith("/auth/")) {
+        if (headerAuth != null && headerAuth.startsWith("Bearer ")) {
             return headerAuth.substring(7);
         }
 

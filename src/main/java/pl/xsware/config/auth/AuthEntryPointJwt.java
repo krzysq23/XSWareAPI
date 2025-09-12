@@ -7,6 +7,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.web.AuthenticationEntryPoint;
 import org.springframework.stereotype.Component;
+import pl.xsware.domain.model.auth.JwtValidation;
 
 import java.io.IOException;
 import java.util.Map;
@@ -24,7 +25,7 @@ public class AuthEntryPointJwt implements AuthenticationEntryPoint {
         new ObjectMapper().writeValue(response.getOutputStream(), Map.of(
                 "status", 401,
                 "error", "Unauthorized",
-                "message", "Sesja wygasła. Zaloguj się ponownie.",
+                "message", JwtValidation.EXPIRED.getLabel(),
                 "path", request.getServletPath()
         ));
     }

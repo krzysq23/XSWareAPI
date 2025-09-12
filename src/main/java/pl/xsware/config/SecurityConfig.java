@@ -3,6 +3,7 @@ package pl.xsware.config;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.core.annotation.Order;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.config.Customizer;
 import org.springframework.security.config.annotation.authentication.configuration.AuthenticationConfiguration;
@@ -27,19 +28,23 @@ public class SecurityConfig {
     private AuthTokenFilter authTokenFilter;
 
     @Bean
-    public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
-        http
+    @Order(1)
+    public SecurityFilterChain apiSecurity(HttpSecurity http) throws Exception {
+        http.securityMatcher("/api/**")
                 .csrf(AbstractHttpConfigurer::disable)
                 .cors(Customizer.withDefaults())
-                .authorizeHttpRequests(auth -> auth
-                        .requestMatchers("/auth/**", "/public/**").permitAll()
-                        .requestMatchers("/api/**").authenticated()
-                )
-                .exceptionHandling(ex -> ex.authenticationEntryPoint(authEntryPointJwt))
-                .sessionManagement(sm -> sm.sessionCreationPolicy(SessionCreationPolicy.STATELESS));
+                .authorizeHttpRequests(a -> a.anyRequest().authenticated())
+                .addFilterBefore(authTokenFilter, UsernamePasswordAuthenticationFilter.class)
+                .sessionManagement(s -> s.sessionCreationPolicy(SessionCreationPolicy.STATELESS));
+        return http.build();
+    }
 
-        http.addFilterBefore(authTokenFilter, UsernamePasswordAuthenticationFilter.class);
-
+    @Bean
+    @Order(2)
+    public SecurityFilterChain publicSecurity(HttpSecurity http) throws Exception {
+        http.securityMatcher("/auth/**", "/public/**")
+                .csrf(AbstractHttpConfigurer::disable)
+                .authorizeHttpRequests(a -> a.anyRequest().permitAll());
         return http.build();
     }
 

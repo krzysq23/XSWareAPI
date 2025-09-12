@@ -9,6 +9,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
+import pl.xsware.domain.model.auth.JwtType;
 import pl.xsware.domain.model.auth.JwtValidation;
 import pl.xsware.domain.model.user.UserDto;
 
@@ -33,7 +34,7 @@ public class JwtUtils {
         return Keys.hmacShaKeyFor(jwtSecret.getBytes(StandardCharsets.UTF_8));
     }
 
-    public String generateJwtToken(UserDto user) {
+    public String generateAccessToken(UserDto user) {
         Date now = new Date();
         Date expiryDate = new Date(now.getTime() + accessExpirationMs);
 
@@ -41,6 +42,7 @@ public class JwtUtils {
                 .subject(user.getEmail())
                 .claim("userId", user.getId())
                 .claim("roles", user.getRoles())
+                .claim("tokenType", JwtType.ACCESS)
                 .issuedAt(now)
                 .expiration(expiryDate)
                 .signWith(getSigningKey(), Jwts.SIG.HS256)
@@ -55,6 +57,7 @@ public class JwtUtils {
                 .subject(user.getEmail())
                 .claim("userId", user.getId())
                 .claim("roles", user.getRoles())
+                .claim("tokenType", JwtType.REFRESH)
                 .issuedAt(now)
                 .expiration(expiryDate)
                 .signWith(getSigningKey(), Jwts.SIG.HS256)
@@ -103,16 +106,21 @@ public class JwtUtils {
                 .get("roles", List.class);
     }
 
-    public JwtValidation validateJwtToken(String authToken) {
+    public JwtValidation validateJwtToken(String token, JwtType expectedType) {
         try {
-            if(authToken == null) {
+            if(token == null) {
                 return JwtValidation.NONE;
             }
-            Jwts.parser()
+            Claims claims = Jwts.parser()
                     .verifyWith(getSigningKey())
                     .clockSkewSeconds(60)
                     .build()
-                    .parseSignedClaims(authToken);
+                    .parseSignedClaims(token)
+                    .getPayload();
+            String tokenType = claims.get("tokenType", String.class);
+            if (tokenType == null || !tokenType.equalsIgnoreCase(expectedType.name())) {
+                return JwtValidation.INVALID;
+            }
             return JwtValidation.VALID;
         } catch (io.jsonwebtoken.ExpiredJwtException e) {
             log.warn("Token wygasł: {}", e.getClaims().getExpiration());

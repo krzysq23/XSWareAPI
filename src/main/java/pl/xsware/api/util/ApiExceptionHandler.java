@@ -48,6 +48,14 @@ public class ApiExceptionHandler {
                 .body(ErrorResponse.parseStringResponse("Żądany format odpowiedzi nie jest dostępny!", HttpStatus.NOT_ACCEPTABLE));
     }
 
+    @ExceptionHandler(io.jsonwebtoken.JwtException.class)
+    public ResponseEntity<ErrorResponse> handleJwtException(Exception ex) {
+        return ResponseEntity
+                .status(HttpStatus.NOT_ACCEPTABLE)
+                .contentType(MediaType.APPLICATION_JSON)
+                .body(ErrorResponse.parseStringResponse(ex.getMessage(), HttpStatus.NOT_ACCEPTABLE));
+    }
+
     @ExceptionHandler(Exception.class)
     public ResponseEntity<ErrorResponse> handleGenericException(Exception ex) {
         return ResponseEntity
