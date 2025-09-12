@@ -23,9 +23,9 @@ public class JwtUtils {
 
     @Value("${jwt.secret}")
     private String jwtSecret;
-    @Value("${jwt.access-expiration-ms}")
+    @Value("${jwt.accessExpirationMs}")
     private long accessExpirationMs;
-    @Value("${jwt.refresh-expiration-ms}")
+    @Value("${jwt.refreshExpirationMs}")
     private long refreshExpirationMs;
 
     private final Logger log = LoggerFactory.getLogger(JwtUtils.class);
