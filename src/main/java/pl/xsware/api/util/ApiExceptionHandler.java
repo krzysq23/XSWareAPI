@@ -56,6 +56,14 @@ public class ApiExceptionHandler {
                 .body(ErrorResponse.parseStringResponse(ex.getMessage(), HttpStatus.NOT_ACCEPTABLE));
     }
 
+    @ExceptionHandler(io.jsonwebtoken.ExpiredJwtException.class)
+    public ResponseEntity<ErrorResponse> handleExpiredJwtException(Exception ex) {
+        return ResponseEntity
+                .status(HttpStatus.UNAUTHORIZED)
+                .contentType(MediaType.APPLICATION_JSON)
+                .body(ErrorResponse.parseStringResponse(ex.getMessage(), HttpStatus.UNAUTHORIZED));
+    }
+
     @ExceptionHandler(Exception.class)
     public ResponseEntity<ErrorResponse> handleGenericException(Exception ex) {
         return ResponseEntity

@@ -68,6 +68,7 @@ public class JwtUtils {
     public UserDto getUserFromJwtToken(String token) {
         Claims claim = Jwts.parser()
                 .verifyWith(getSigningKey())
+                .clockSkewSeconds(60)
                 .build()
                 .parseSignedClaims(token)
                 .getPayload();
@@ -81,6 +82,7 @@ public class JwtUtils {
     public String getEmailFromJwtToken(String token) {
         return Jwts.parser()
                 .verifyWith(getSigningKey())
+                .clockSkewSeconds(60)
                 .build()
                 .parseSignedClaims(token)
                 .getPayload()
@@ -90,6 +92,7 @@ public class JwtUtils {
     public Long getUserIdFromJwtToken(String token) {
         return Jwts.parser()
                 .verifyWith(getSigningKey())
+                .clockSkewSeconds(60)
                 .build()
                 .parseSignedClaims(token)
                 .getPayload()
@@ -100,6 +103,7 @@ public class JwtUtils {
     public List<String> getRolesFromJwtToken(String token) {
         return Jwts.parser()
                 .verifyWith(getSigningKey())
+                .clockSkewSeconds(60)
                 .build()
                 .parseSignedClaims(token)
                 .getPayload()

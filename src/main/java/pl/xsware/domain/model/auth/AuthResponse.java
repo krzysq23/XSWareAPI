@@ -8,12 +8,12 @@ import pl.xsware.domain.model.user.UserDto;
 @Builder
 public class AuthResponse {
 
-    private String token;
+    private String accessToken;
     private UserDto user;
 
     public static AuthResponse create(UserDto user, String accessToken) {
         return AuthResponse.builder()
-                .token(accessToken)
+                .accessToken(accessToken)
                 .user(user)
                 .build();
     }
