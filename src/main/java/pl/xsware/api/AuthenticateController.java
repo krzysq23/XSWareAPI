@@ -1,19 +1,19 @@
 package pl.xsware.api;
 
+import io.jsonwebtoken.JwtException;
 import jakarta.validation.Valid;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpHeaders;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseCookie;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.web.bind.annotation.*;
-import pl.xsware.domain.model.auth.*;
-import pl.xsware.domain.model.user.UserRequest;
+import pl.xsware.config.properties.AppConstants;
 import pl.xsware.domain.model.Response;
+import pl.xsware.domain.model.auth.*;
 import pl.xsware.domain.model.user.UserDto;
+import pl.xsware.domain.model.user.UserRequest;
 import pl.xsware.domain.service.AuthService;
 import pl.xsware.domain.service.UserService;
 import pl.xsware.util.CookieUtils;
@@ -39,17 +39,15 @@ public class AuthenticateController {
     @Autowired
     private JwtUtils jwtUtils;
 
-    public static final String REFRESH_COOKIE_NAME = "refreshToken";
-
     @PostMapping("/login")
     public ResponseEntity<AuthResponse> authenticateUser(@RequestBody AuthRequest authRequest) {
         UserDto user = authService.authenticate(authRequest);
         String accessToken = jwtUtils.generateAccessToken(user);
         String refreshToken = jwtUtils.generateRefreshToken(user);
-        ResponseCookie refreshCookie = cookieUtils.buildRefreshCookie(REFRESH_COOKIE_NAME, refreshToken);
+        ResponseCookie refreshCookie = cookieUtils.buildRefreshCookie(AppConstants.REFRESH_COOKIE_NAME, refreshToken);
         return ResponseEntity.ok()
                 .header(HttpHeaders.SET_COOKIE, refreshCookie.toString())
-                .body(AuthResponse.create(user, accessToken));
+                .body(AuthResponse.builder().user(user).accessToken(accessToken).build());
     }
 
     @PostMapping("/register")
@@ -59,33 +57,36 @@ public class AuthenticateController {
     }
 
     @GetMapping("/refresh")
-    public ResponseEntity<AuthResponse> refreshToken(@CookieValue(name = REFRESH_COOKIE_NAME, required = false) String refreshCookieValue) {
+    public ResponseEntity<TokenResponse> refreshToken(@CookieValue(name = AppConstants.REFRESH_COOKIE_NAME, required = false) String refreshCookieValue) {
         if (refreshCookieValue == null || refreshCookieValue.isBlank()) {
-            throw new io.jsonwebtoken.JwtException(JwtValidation.NONE.getLabel());
+            throw new JwtException(JwtValidation.NONE.getLabel());
         }
 
-        var result = jwtUtils.validateJwtToken(refreshCookieValue, JwtType.REFRESH);
-        if (result != JwtValidation.VALID) {
-            ResponseCookie delete = cookieUtils.deleteRefreshCookie(REFRESH_COOKIE_NAME);
-            return ResponseEntity.status(401)
-                    .header(HttpHeaders.SET_COOKIE, delete.toString())
-                    .build();
-        }
-
-        UserDto user = jwtUtils.getUserFromJwtToken(refreshCookieValue);
-        String newAccess = jwtUtils.generateAccessToken(user);
-        String newRefresh = jwtUtils.generateRefreshToken(user);
-
-        ResponseCookie newCookie = cookieUtils.buildRefreshCookie(REFRESH_COOKIE_NAME, newRefresh);
+        Token token = authService.createNewTokens(refreshCookieValue);
+        ResponseCookie newCookie = cookieUtils.buildRefreshCookie(AppConstants.REFRESH_COOKIE_NAME, token.getRefreshToken());
 
         return ResponseEntity.ok()
                 .header(HttpHeaders.SET_COOKIE, newCookie.toString())
-                .body(AuthResponse.create(null, newAccess));
+                .body(new TokenResponse(token.getAccessToken()));
+    }
+
+    @GetMapping("/status")
+    public ResponseEntity<TokenResponse> status(@CookieValue(name = AppConstants.REFRESH_COOKIE_NAME, required = false) String refreshCookieValue) {
+        if (refreshCookieValue == null || refreshCookieValue.isBlank()) {
+            return ResponseEntity.ok().build();
+        }
+
+        Token token = authService.createNewTokens(refreshCookieValue);
+        ResponseCookie newCookie = cookieUtils.buildRefreshCookie(AppConstants.REFRESH_COOKIE_NAME, token.getRefreshToken());
+
+        return ResponseEntity.ok()
+                .header(HttpHeaders.SET_COOKIE, newCookie.toString())
+                .body(new TokenResponse(token.getAccessToken()));
     }
 
     @PostMapping("/logout")
     public ResponseEntity<Response> logout() {
-        ResponseCookie delete = cookieUtils.deleteRefreshCookie(REFRESH_COOKIE_NAME);
+        ResponseCookie delete = cookieUtils.deleteRefreshCookie(AppConstants.REFRESH_COOKIE_NAME);
         return ResponseEntity.ok()
                 .header(HttpHeaders.SET_COOKIE, delete.toString())
                 .body(Response.create("Wylogowano"));

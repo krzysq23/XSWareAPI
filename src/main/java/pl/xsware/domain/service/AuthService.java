@@ -1,5 +1,6 @@
 package pl.xsware.domain.service;
 
+import io.jsonwebtoken.JwtException;
 import jakarta.validation.Valid;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -9,9 +10,9 @@ import org.springframework.web.reactive.function.client.WebClient;
 import org.springframework.web.reactive.function.client.WebClientResponseException;
 import pl.xsware.api.util.WebClientErrorHandler;
 import pl.xsware.domain.model.Response;
-import pl.xsware.domain.model.auth.ChangePasswordRequest;
-import pl.xsware.domain.model.auth.AuthRequest;
+import pl.xsware.domain.model.auth.*;
 import pl.xsware.domain.model.user.UserDto;
+import pl.xsware.util.JwtUtils;
 
 @Slf4j
 @Service
@@ -21,6 +22,9 @@ public class AuthService {
     private String authenticatePath;
     @Value("${app.service.db-connector.endpoints.auth.changePassword}")
     private String changePasswordPath;
+
+    @Autowired
+    private JwtUtils jwtUtils;
 
     @Autowired
     private WebClient webClient;
@@ -47,5 +51,17 @@ public class AuthService {
                 .bodyToMono(Response.class)
                 .onErrorResume(WebClientResponseException.class, WebClientErrorHandler::handle)
                 .block();
+    }
+
+    public Token createNewTokens(String refreshToken) throws JwtException {
+        var result = jwtUtils.validateJwtToken(refreshToken, JwtType.REFRESH);
+        if (result != JwtValidation.VALID) {
+            throw new JwtException(result.name());
+        }
+        UserDto user = jwtUtils.getUserFromJwtToken(refreshToken);
+        return new Token(
+                jwtUtils.generateAccessToken(user),
+                jwtUtils.generateRefreshToken(user)
+        );
     }
 }

@@ -126,10 +126,10 @@ public class JwtUtils {
                 return JwtValidation.INVALID;
             }
             return JwtValidation.VALID;
-        } catch (io.jsonwebtoken.ExpiredJwtException e) {
+        } catch (ExpiredJwtException e) {
             log.warn("Token wygasł: {}", e.getClaims().getExpiration());
             return JwtValidation.EXPIRED;
-        } catch (io.jsonwebtoken.JwtException | IllegalArgumentException e) {
+        } catch (JwtException | IllegalArgumentException e) {
             log.warn("Nieprawidłowy token: {}", e.getMessage());
             return JwtValidation.INVALID;
         }

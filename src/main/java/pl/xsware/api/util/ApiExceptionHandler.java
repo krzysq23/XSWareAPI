@@ -1,20 +1,26 @@
 package pl.xsware.api.util;
 
+import io.jsonwebtoken.ExpiredJwtException;
+import io.jsonwebtoken.JwtException;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.MediaType;
-import org.springframework.http.ResponseEntity;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.*;
 import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.web.HttpMediaTypeNotAcceptableException;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.client.HttpClientErrorException;
+import pl.xsware.config.properties.AppConstants;
 import pl.xsware.domain.model.ErrorResponse;
+import pl.xsware.util.CookieUtils;
 
 @Slf4j
 @ControllerAdvice
 public class ApiExceptionHandler {
+
+    @Autowired
+    private CookieUtils cookieUtils;
 
     @ExceptionHandler(HttpClientErrorException.class)
     public ResponseEntity<ErrorResponse> handleHttpClientErrorException(HttpClientErrorException ex) {
@@ -48,15 +54,17 @@ public class ApiExceptionHandler {
                 .body(ErrorResponse.parseStringResponse("Żądany format odpowiedzi nie jest dostępny!", HttpStatus.NOT_ACCEPTABLE));
     }
 
-    @ExceptionHandler(io.jsonwebtoken.JwtException.class)
+    @ExceptionHandler(JwtException.class)
     public ResponseEntity<ErrorResponse> handleJwtException(Exception ex) {
+        ResponseCookie delete = cookieUtils.deleteRefreshCookie(AppConstants.REFRESH_COOKIE_NAME);
         return ResponseEntity
-                .status(HttpStatus.NOT_ACCEPTABLE)
+                .status(HttpStatus.UNAUTHORIZED)
+                .header(HttpHeaders.SET_COOKIE, delete.toString())
                 .contentType(MediaType.APPLICATION_JSON)
-                .body(ErrorResponse.parseStringResponse(ex.getMessage(), HttpStatus.NOT_ACCEPTABLE));
+                .body(ErrorResponse.parseStringResponse(ex.getMessage(), HttpStatus.UNAUTHORIZED));
     }
 
-    @ExceptionHandler(io.jsonwebtoken.ExpiredJwtException.class)
+    @ExceptionHandler(ExpiredJwtException.class)
     public ResponseEntity<ErrorResponse> handleExpiredJwtException(Exception ex) {
         return ResponseEntity
                 .status(HttpStatus.UNAUTHORIZED)
