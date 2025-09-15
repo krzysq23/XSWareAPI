@@ -5,7 +5,7 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import org.springframework.http.HttpStatusCode;
-import pl.xsware.util.JsonValidator;
+import pl.xsware.util.json.JsonValidator;
 
 import java.time.LocalDateTime;
 

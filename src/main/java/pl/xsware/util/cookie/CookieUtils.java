@@ -1,4 +1,4 @@
-package pl.xsware.util;
+package pl.xsware.util.cookie;
 
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.ResponseCookie;

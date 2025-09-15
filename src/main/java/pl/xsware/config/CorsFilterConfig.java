@@ -28,7 +28,7 @@ public class CorsFilterConfig {
         config.setAllowedHeaders(corsProperties.getHeaders());
         config.setAllowCredentials(true);
         config.setMaxAge(3600L);
-        config.setExposedHeaders(List.of("*"));
+        config.setExposedHeaders(corsProperties.getHeaders());
 
         UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
         source.registerCorsConfiguration("/**", config);

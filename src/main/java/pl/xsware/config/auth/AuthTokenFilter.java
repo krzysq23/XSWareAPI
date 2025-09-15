@@ -10,8 +10,6 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
-import org.springframework.security.authentication.BadCredentialsException;
-import org.springframework.security.authentication.InsufficientAuthenticationException;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.GrantedAuthority;
@@ -24,7 +22,7 @@ import pl.xsware.domain.model.auth.CustomUserDetails;
 import pl.xsware.domain.model.auth.JwtType;
 import pl.xsware.domain.model.auth.JwtValidation;
 import pl.xsware.domain.service.UserService;
-import pl.xsware.util.JwtUtils;
+import pl.xsware.util.jwt.JwtUtils;
 
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;

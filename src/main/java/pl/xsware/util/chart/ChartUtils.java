@@ -1,4 +1,4 @@
-package pl.xsware.util;
+package pl.xsware.util.chart;
 
 import org.springframework.stereotype.Component;
 import pl.xsware.domain.model.category.CategoryType;

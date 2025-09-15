@@ -12,7 +12,7 @@ import pl.xsware.api.util.WebClientErrorHandler;
 import pl.xsware.domain.model.Response;
 import pl.xsware.domain.model.auth.*;
 import pl.xsware.domain.model.user.UserDto;
-import pl.xsware.util.JwtUtils;
+import pl.xsware.util.jwt.JwtUtils;
 
 @Slf4j
 @Service

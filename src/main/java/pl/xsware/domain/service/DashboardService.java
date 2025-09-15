@@ -5,21 +5,17 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import pl.xsware.config.auth.CurrentUserProvider;
 import pl.xsware.domain.model.category.CategoryType;
-import pl.xsware.domain.model.chart.PieChart;
-import pl.xsware.domain.model.chart.Colors;
 import pl.xsware.domain.model.dashboard.Dashboard;
 import pl.xsware.domain.model.financialGoal.FinancialGoal;
 import pl.xsware.domain.model.transaction.Transaction;
 import pl.xsware.domain.model.transaction.TransactionRange;
 import pl.xsware.domain.model.transaction.TransactionRequest;
-import pl.xsware.util.ChartUtils;
-import pl.xsware.util.TransactionUtils;
+import pl.xsware.util.chart.ChartUtils;
+import pl.xsware.util.data.TransactionUtils;
 
 import java.math.BigDecimal;
-import java.math.RoundingMode;
 import java.util.List;
 import java.util.Map;
-import java.util.concurrent.atomic.AtomicInteger;
 import java.util.stream.Collectors;
 
 @Slf4j

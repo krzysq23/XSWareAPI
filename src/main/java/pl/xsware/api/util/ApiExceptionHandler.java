@@ -13,7 +13,7 @@ import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.client.HttpClientErrorException;
 import pl.xsware.config.properties.AppConstants;
 import pl.xsware.domain.model.ErrorResponse;
-import pl.xsware.util.CookieUtils;
+import pl.xsware.util.cookie.CookieUtils;
 
 @Slf4j
 @ControllerAdvice

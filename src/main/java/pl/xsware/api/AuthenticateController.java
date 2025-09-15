@@ -16,8 +16,8 @@ import pl.xsware.domain.model.user.UserDto;
 import pl.xsware.domain.model.user.UserRequest;
 import pl.xsware.domain.service.AuthService;
 import pl.xsware.domain.service.UserService;
-import pl.xsware.util.CookieUtils;
-import pl.xsware.util.JwtUtils;
+import pl.xsware.util.cookie.CookieUtils;
+import pl.xsware.util.jwt.JwtUtils;
 
 @Slf4j
 @RestController
