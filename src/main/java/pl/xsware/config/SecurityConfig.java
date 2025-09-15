@@ -1,6 +1,7 @@
 package pl.xsware.config;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.web.servlet.FilterRegistrationBean;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.core.annotation.Order;
@@ -27,8 +28,34 @@ public class SecurityConfig {
     @Autowired
     private AuthTokenFilter authTokenFilter;
 
+    // wyłączenie automatycznej rejestracji filtra na poziomie serwletów
+    @Bean
+    public FilterRegistrationBean<AuthTokenFilter> authTokenFilterRegistration(AuthTokenFilter f) {
+        FilterRegistrationBean<AuthTokenFilter> reg = new FilterRegistrationBean<>(f);
+        reg.setEnabled(false);
+        return reg;
+    }
+
     @Bean
     @Order(1)
+    public SecurityFilterChain publicSecurity(HttpSecurity http) throws Exception {
+        http.securityMatcher(
+                        "/auth/**",
+                        "/public/**",
+                        "/v3/api-docs/**",
+                        "/swagger-ui/**",
+                        "/swagger-ui.html",
+                        "/api/v3/api-docs/**",
+                        "/api/swagger-ui/**",
+                        "/api/swagger-ui.html"
+                )
+                .csrf(AbstractHttpConfigurer::disable)
+                .authorizeHttpRequests(a -> a.anyRequest().permitAll());
+        return http.build();
+    }
+
+    @Bean
+    @Order(2)
     public SecurityFilterChain apiSecurity(HttpSecurity http) throws Exception {
         http.securityMatcher("/api/**")
                 .csrf(AbstractHttpConfigurer::disable)
@@ -36,15 +63,6 @@ public class SecurityConfig {
                 .authorizeHttpRequests(a -> a.anyRequest().authenticated())
                 .addFilterBefore(authTokenFilter, UsernamePasswordAuthenticationFilter.class)
                 .sessionManagement(s -> s.sessionCreationPolicy(SessionCreationPolicy.STATELESS));
-        return http.build();
-    }
-
-    @Bean
-    @Order(2)
-    public SecurityFilterChain publicSecurity(HttpSecurity http) throws Exception {
-        http.securityMatcher("/auth/**", "/public/**")
-                .csrf(AbstractHttpConfigurer::disable)
-                .authorizeHttpRequests(a -> a.anyRequest().permitAll());
         return http.build();
     }
 

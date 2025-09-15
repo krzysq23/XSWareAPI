@@ -5,8 +5,6 @@ import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
@@ -16,7 +14,6 @@ import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Component;
-import org.springframework.util.AntPathMatcher;
 import org.springframework.web.filter.OncePerRequestFilter;
 import pl.xsware.domain.model.auth.CustomUserDetails;
 import pl.xsware.domain.model.auth.JwtType;
@@ -38,19 +35,6 @@ public class AuthTokenFilter extends OncePerRequestFilter {
 
     @Autowired
     private UserService userService;
-
-    private static final AntPathMatcher PATH_MATCHER = new AntPathMatcher();
-
-    private final Logger log = LoggerFactory.getLogger(AuthTokenFilter.class);
-
-    @Override
-    protected boolean shouldNotFilter(HttpServletRequest request) {
-        String path = request.getServletPath();
-        return PATH_MATCHER.match("/auth/**", path)
-                || PATH_MATCHER.match("/public/**", path)
-                || PATH_MATCHER.match("/error", path)
-                || "OPTIONS".equalsIgnoreCase(request.getMethod());
-    }
 
     @Override
     protected void doFilterInternal(
