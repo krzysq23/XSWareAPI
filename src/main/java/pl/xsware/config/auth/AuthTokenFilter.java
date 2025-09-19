@@ -45,6 +45,11 @@ public class AuthTokenFilter extends OncePerRequestFilter {
     {
 
         String jwt = parseJwt(request);
+        if (jwt == null) {
+            filterChain.doFilter(request, response);
+            return;
+        }
+
         JwtValidation valid = jwtUtils.validateJwtToken(jwt, JwtType.ACCESS);
         switch (valid) {
             case VALID -> {
