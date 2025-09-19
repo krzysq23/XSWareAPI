@@ -2,6 +2,7 @@ package pl.xsware.api.util;
 
 import io.jsonwebtoken.ExpiredJwtException;
 import io.jsonwebtoken.JwtException;
+import jakarta.servlet.ServletException;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.*;
@@ -70,6 +71,14 @@ public class ApiExceptionHandler {
                 .status(HttpStatus.UNAUTHORIZED)
                 .contentType(MediaType.APPLICATION_JSON)
                 .body(ErrorResponse.parseStringResponse(ex.getMessage(), HttpStatus.UNAUTHORIZED));
+    }
+
+    @ExceptionHandler(ServletException.class)
+    public ResponseEntity<ErrorResponse> handleServletException(Exception ex) {
+        return ResponseEntity
+                .status(HttpStatus.NOT_FOUND)
+                .contentType(MediaType.APPLICATION_JSON)
+                .body(ErrorResponse.parseStringResponse("Wystąpił niespodziewany błąd!", HttpStatus.NOT_FOUND));
     }
 
     @ExceptionHandler(Exception.class)
