@@ -16,6 +16,7 @@ import org.springframework.web.client.HttpClientErrorException;
 import pl.xsware.config.properties.AppConstants;
 import pl.xsware.domain.model.ErrorResponse;
 import pl.xsware.util.cookie.CookieUtils;
+import pl.xsware.util.json.JsonValidator;
 
 @Slf4j
 @ControllerAdvice
@@ -26,10 +27,11 @@ public class ApiExceptionHandler {
 
     @ExceptionHandler(HttpClientErrorException.class)
     public ResponseEntity<ErrorResponse> handleHttpClientErrorException(HttpClientErrorException ex) {
+        ErrorResponse err = JsonValidator.parseErrorResponse(ex.getStatusText());
         return ResponseEntity
                 .status(HttpStatus.NOT_ACCEPTABLE)
                 .contentType(MediaType.APPLICATION_JSON)
-                .body(ErrorResponse.parseStringResponse("Błąd podczas uwierzytelnienia", HttpStatus.NOT_ACCEPTABLE));
+                .body(ErrorResponse.parseStringResponse(!err.getMessage().isEmpty() ? err.getMessage() : "Błąd podczas uwierzytelnienia", HttpStatus.NOT_ACCEPTABLE));
     }
 
     @ExceptionHandler(BadCredentialsException.class)
