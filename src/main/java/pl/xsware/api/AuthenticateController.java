@@ -20,6 +20,7 @@ import pl.xsware.domain.service.UserService;
 import pl.xsware.util.cookie.CookieUtils;
 import pl.xsware.util.jwt.JwtUtils;
 
+import static pl.xsware.domain.model.auth.JwtValidation.EXPIRED;
 import static pl.xsware.domain.model.auth.JwtValidation.VALID;
 
 @Slf4j
@@ -82,7 +83,7 @@ public class AuthenticateController {
             if(authorizationHeader != null && authorizationHeader.startsWith("Bearer ")) {
                 String jwt = authorizationHeader.substring(7);
                 JwtValidation valid = jwtUtils.validateJwtToken(jwt, JwtType.ACCESS);
-                if(valid.equals(VALID)) {
+                if(valid.equals(VALID) || valid.equals(EXPIRED)) {
                     return ResponseEntity.ok().build();
                 } else {
                     return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
