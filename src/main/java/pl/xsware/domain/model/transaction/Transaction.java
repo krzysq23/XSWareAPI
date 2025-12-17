@@ -1,5 +1,6 @@
 package pl.xsware.domain.model.transaction;
 
+import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import pl.xsware.domain.model.category.CategoryType;
@@ -10,6 +11,7 @@ import java.time.LocalDate;
 
 @Data
 @Builder
+@AllArgsConstructor
 public class Transaction {
 
     private Long id;
