@@ -3,6 +3,8 @@
 # Compiled output
 /dist
 /tmp
+.envrc
+src/main/resources/application.properties
 
 # IDEs and editors
 .idea/
