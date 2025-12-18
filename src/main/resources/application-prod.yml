@@ -1,0 +1,100 @@
+server:
+  port: 8084
+
+# Logging
+logging:
+  level:
+    org.springframework: INFO
+    org.springframework.security: INFO
+    org.springframework.security.core: INFO
+    org.springframework.security.authentication: INFO
+    reactor.netty.http.client: WARN
+    org.springframework.web.reactive.function.client.ExchangeFunctions: WARN
+    org.springframework.web.reactive.function.client.WebClient: WARN
+
+# JWT auth
+jwt:
+  secret: ${JWT_SECRET}
+  accessExpirationMs: ${JWT_ACCESS_EXP_MS:900000}
+  refreshExpirationMs: ${JWT_REFRESH_EXP_MS:604800000}
+  cookie:
+    secure: true
+    path: /auth
+    sameSite: None
+
+springdoc:
+  swagger-ui:
+    path: /swagger
+    operations-sorter: method
+  api-docs:
+    path: /v3/api-docs
+  default-produces-media-type: application/json
+
+security:
+  users:
+    - username: swagger
+      password: swagger
+      roles: [ SWAGGER ]
+
+app:
+  service:
+    db-connector:
+      url: ${DB_CONNECTOR_URL}
+      prefix: ${DB_CONNECTOR_PREFIX:/api/v1}
+      auth:
+        user: ${DB_CONNECTOR_USER}
+        password: ${DB_CONNECTOR_PASS}
+      endpoints:
+        auth:
+          authenticate: ${app.service.db-connector.prefix}/authenticate
+          changePassword: ${app.service.db-connector.prefix}/changePassword
+        user:
+          getUser: ${app.service.db-connector.prefix}/user/{id}
+          getAllUsers: ${app.service.db-connector.prefix}/users
+          userExist: ${app.service.db-connector.prefix}/user/exist/{login}
+          userCreate: ${app.service.db-connector.prefix}/user/create
+          userEdit: ${app.service.db-connector.prefix}/user/edit
+          userRemove: ${app.service.db-connector.prefix}/user/remove/{id}
+        budget:
+          getBudgets: ${app.service.db-connector.prefix}/budget/get
+          add: ${app.service.db-connector.prefix}/budget/add
+          remove: ${app.service.db-connector.prefix}/budget/remove
+          edit: ${app.service.db-connector.prefix}/budget/edit
+        category:
+          getAll: ${app.service.db-connector.prefix}/category/all/{userId}
+          add: ${app.service.db-connector.prefix}/category/add
+          remove: ${app.service.db-connector.prefix}/category/remove
+          edit: ${app.service.db-connector.prefix}/category/edit
+        notification:
+          getAll: ${app.service.db-connector.prefix}/notification/all/{userId}
+          add: ${app.service.db-connector.prefix}/notification/add
+          remove: ${app.service.db-connector.prefix}/notification/remove
+          changeAsRead: ${app.service.db-connector.prefix}/notification/changeAsRead
+        transaction:
+          getAll: ${app.service.db-connector.prefix}/transaction/get
+          add: ${app.service.db-connector.prefix}/transaction/add
+          remove: ${app.service.db-connector.prefix}/transaction/remove
+          edit: ${app.service.db-connector.prefix}/transaction/edit
+        financialGoal:
+          getAll: ${app.service.db-connector.prefix}/financialGoal/all/{userId}
+          add: ${app.service.db-connector.prefix}/financialGoal/add
+          remove: ${app.service.db-connector.prefix}/financialGoal/remove
+          edit: ${app.service.db-connector.prefix}/financialGoal/edit
+  # CORS FILTERS
+  web:
+    cors:
+      origins:
+        - "http://localhost:4300"
+        - "http://localhost:3000"
+        - "https://xsware.pl"
+        - "https://app.xsware.pl"
+        - "https://connector.xsware.pl"
+      headers:
+        - "Content-Type"
+        - "Content-Disposition"
+        - "Content-Length"
+        - "X-Requested-With"
+        - "Authorization"
+  # Mail
+  mail:
+    to: krzysztof.skarbowski@gmail.com
